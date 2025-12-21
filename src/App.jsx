@@ -6,6 +6,7 @@ import AuthLayout from "./Layout/AuthLayout";
 import Login from "./Auth/Page/Login";
 import Register from "./Auth/Page/Register";
 import ForgotPassword from "./Auth/Page/ForgotPassword";
+import Dashboard from "./Feature/Page/Dashboard/Dashboard";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route element={<AuthLayout/>}>
           <Route path="/login" element={<Login/>}/>
           <Route path="/register" element={<Register/>}/>

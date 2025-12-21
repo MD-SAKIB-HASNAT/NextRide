@@ -1,8 +1,21 @@
 import React, { useState } from "react";
-import { Phone, Search, Menu, X } from "lucide-react";
+import { Phone, Search, Menu, X, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  
+  // Check if user is logged in
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isLoggedIn = !!token;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -60,12 +73,34 @@ export default function Header() {
               </div>
             </div>
 
-            <a
-              href="/login"
-              className="hidden md:inline-flex items-center rounded-full bg-sky-500 px-5 py-2 text-sm text-white font-medium hover:bg-sky-600 transition"
-            >
-              Login
-            </a>
+            {isLoggedIn ? (
+              <div className="hidden md:flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-slate-900">{user?.name}</p>
+                  <p className="text-xs text-slate-500">{user?.role}</p>
+                </div>
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="inline-flex items-center rounded-full bg-sky-500 px-5 py-2 text-sm text-white font-medium hover:bg-sky-600 transition"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-2 rounded-full border border-red-300 px-4 py-2 text-sm text-red-600 font-medium hover:bg-red-50 transition"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <a
+                href="/login"
+                className="hidden md:inline-flex items-center rounded-full bg-sky-500 px-5 py-2 text-sm text-white font-medium hover:bg-sky-600 transition"
+              >
+                Login
+              </a>
+            )}
 
             {/* Mobile menu button */}
             <button
@@ -116,12 +151,36 @@ export default function Header() {
               <p className="text-xs text-slate-500">Support</p>
               <p className="font-medium text-slate-900">01992403647</p>
 
-              <a
-                href="/login"
-                className="mt-3 inline-block w-full text-center rounded-full bg-sky-500 px-4 py-2 text-white text-sm"
-              >
-                Login
-              </a>
+              {isLoggedIn ? (
+                <div className="mt-3 space-y-2">
+                  <p className="text-sm font-medium text-slate-900">{user?.name}</p>
+                  <button
+                    onClick={() => {
+                      navigate("/dashboard");
+                      setMobileOpen(false);
+                    }}
+                    className="w-full text-center rounded-full bg-sky-500 px-4 py-2 text-white text-sm font-medium"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileOpen(false);
+                    }}
+                    className="w-full text-center rounded-full border border-red-300 px-4 py-2 text-red-600 text-sm font-medium"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <a
+                  href="/login"
+                  className="mt-3 inline-block w-full text-center rounded-full bg-sky-500 px-4 py-2 text-white text-sm"
+                >
+                  Login
+                </a>
+              )}
             </div>
           </div>
         </div>

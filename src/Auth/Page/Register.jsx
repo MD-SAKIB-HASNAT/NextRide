@@ -2,15 +2,7 @@ import React, { useState } from "react";
 import { User, Phone, Mail, Lock, Eye, EyeOff, Upload, FileText, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3003";
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import apiClient from "../../api/axiosInstance";
 
 export default function Register() {
   const navigate = useNavigate();
