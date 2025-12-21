@@ -57,8 +57,8 @@ export default function Footer() {
               </div>
               <div>
                 <p className="font-medium">
-                  <a href="tel:01330460307" className="hover:underline">
-                    01330460307
+                  <a href="tel:01992403647" className="hover:underline">
+                    01992403647
                   </a>
                 </p>
                 <p className="text-slate-400 text-sm">Support & Orders</p>

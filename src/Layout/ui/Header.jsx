@@ -56,7 +56,7 @@ export default function Header() {
               </div>
               <div className="text-sm leading-tight">
                 <p className="text-slate-500 text-xs">Support</p>
-                <p className="font-medium text-slate-900">01330460307</p>
+                <p className="font-medium text-slate-900">01992403647</p>
               </div>
             </div>
 
