@@ -1,11 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, User, Mail, Phone, Briefcase, FileText } from "lucide-react";
+import {
+  Activity,
+  Bike,
+  Car,
+  ChevronRight,
+  CreditCard,
+  LogOut,
+  Mail,
+  Phone,
+  Shield,
+  User,
+} from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const mockListings = [
+    {
+      id: "B-201",
+      title: "Yamaha R15 V4",
+      type: "bike",
+      status: "active",
+      paymentStatus: "paid",
+      price: 250000,
+      posted: "Jan 05",
+      location: "Dhaka",
+      views: 134,
+    },
+    {
+      id: "B-225",
+      title: "TVS Apache RTR 4V",
+      type: "bike",
+      status: "pending",
+      paymentStatus: "pending",
+      price: 185000,
+      posted: "Jan 12",
+      location: "Chattogram",
+      views: 42,
+    },
+    {
+      id: "C-014",
+      title: "Toyota Axio 2018",
+      type: "car",
+      status: "active",
+      paymentStatus: "paid",
+      price: 1850000,
+      posted: "Dec 28",
+      location: "Dhaka",
+      views: 89,
+    },
+    {
+      id: "C-077",
+      title: "Honda Vezel 2017",
+      type: "car",
+      status: "review",
+      paymentStatus: "pending",
+      price: 2100000,
+      posted: "Jan 02",
+      location: "Sylhet",
+      views: 51,
+    },
+  ];
+
+  const mockPayments = [
+    {
+      id: "PMT-9821",
+      vehicle: "Toyota Axio",
+      type: "car",
+      amount: 1250,
+      status: "pending",
+      method: "Card",
+      date: "Jan 12, 2025",
+    },
+    {
+      id: "PMT-9822",
+      vehicle: "Yamaha R15 V4",
+      type: "bike",
+      amount: 680,
+      status: "paid",
+      method: "bKash",
+      date: "Jan 10, 2025",
+    },
+    {
+      id: "PMT-9823",
+      vehicle: "Honda Vezel",
+      type: "car",
+      amount: 1490,
+      status: "paid",
+      method: "Nagad",
+      date: "Dec 30, 2024",
+    },
+  ];
 
   useEffect(() => {
     // Check if user is logged in
@@ -42,122 +130,147 @@ export default function Dashboard() {
     return null;
   }
 
+  const stats = {
+    bikeCount: mockListings.filter((i) => i.type === "bike").length,
+    carCount: mockListings.filter((i) => i.type === "car").length,
+    pendingPayments: mockPayments.filter((p) => p.status === "pending").length,
+    paidTotal: mockPayments
+      .filter((p) => p.status === "paid")
+      .reduce((sum, p) => sum + p.amount, 0),
+  };
+
+  const handleStatClick = (targetType) => {
+    navigate(`/my-listings?type=${targetType}`);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-slate-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 border border-sky-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">
-                Welcome, {user.name}!
-              </h1>
-              <p className="text-base text-slate-500">
-                Manage your NextRide account and activities
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+      <div className="max-w-7xl mx-auto px-4 py-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+          <aside className="lg:col-span-2 xl:col-span-2 bg-white rounded-3xl shadow-lg border border-slate-100 p-6 flex flex-col gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-slate-700 flex items-center justify-center text-white text-xl font-semibold shadow-lg">
+                {user.name?.slice(0, 1) || "N"}
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Dashboard</p>
+                <h2 className="text-xl font-semibold text-slate-900">{user.name}</h2>
+                <p className="text-sm text-slate-500">{user.email}</p>
+              </div>
             </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-slate-700">
+                <User size={18} className="text-blue-600" />
+                <span className="font-medium capitalize">{user.role}</span>
+              </div>
+              <div className="flex items-center gap-3 text-slate-700">
+                <Phone size={18} className="text-blue-600" />
+                <span>{user.phone || "No phone added"}</span>
+              </div>
+              <div className="flex items-center gap-3 text-slate-700">
+                <Mail size={18} className="text-blue-600" />
+                <span>{user.email}</span>
+              </div>
+              <div className="flex items-center gap-3 text-slate-700">
+                <Shield size={18} className="text-emerald-500" />
+                <span className="px-3 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-100">Verified</span>
+              </div>
+            </div>
+
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 rounded-full border border-red-300 px-6 py-3 text-red-600 font-medium hover:bg-red-50 transition"
+              className="mt-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-red-50 text-red-600 border border-red-100 px-4 py-3 font-semibold hover:bg-red-100 transition"
             >
-              <LogOut size={18} />
-              Logout
+              <LogOut size={16} /> Logout
             </button>
-          </div>
-        </div>
+          </aside>
 
-        {/* User Info Card */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-sky-100">
-            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <User size={24} className="text-sky-500" />
-              Account Information
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-slate-500">Full Name</label>
-                <p className="text-lg font-semibold text-slate-900">{user.name}</p>
-              </div>
-              <div>
-                <label className="text-sm text-slate-500 flex items-center gap-2">
-                  <Mail size={16} />
-                  Email
-                </label>
-                <p className="text-lg font-semibold text-slate-900">{user.email}</p>
-              </div>
-              <div>
-                <label className="text-sm text-slate-500 flex items-center gap-2">
-                  <Phone size={16} />
-                  Phone
-                </label>
-                <p className="text-lg font-semibold text-slate-900">{user.phone}</p>
+          <main className="lg:col-span-4 xl:col-span-4 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => handleStatClick("all")}
+                className="text-left bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-3xl shadow-lg p-6 hover:-translate-y-0.5 transition transform"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-blue-100">My posts</p>
+                  <Activity size={22} />
+                </div>
+                <h3 className="text-3xl font-bold mt-2">{stats.bikeCount + stats.carCount}</h3>
+                <p className="text-xs text-blue-200 mt-1">{stats.bikeCount} bikes • {stats.carCount} cars</p>
+              </button>
+              <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500">Pending payments</p>
+                  <CreditCard size={22} className="text-orange-500" />
+                </div>
+                <h3 className="text-3xl font-bold text-slate-900 mt-2">{stats.pendingPayments}</h3>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-sky-100">
-            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Briefcase size={24} className="text-sky-500" />
-              Account Details
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-slate-500">Account Type</label>
-                <p className="text-lg font-semibold text-slate-900 capitalize">{user.role}</p>
-              </div>
-              <div>
-                <label className="text-sm text-slate-500">Status</label>
-                <span className="inline-block mt-1 px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  {user.status || "Active"}
-                </span>
-              </div>
-              <div>
-                <label className="text-sm text-slate-500">Email Verified</label>
-                <p className="text-lg font-semibold text-green-600">✓ Yes</p>
-              </div>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <section className="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 xl:col-span-2">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900">Pending payments</h2>
+                    <p className="text-sm text-slate-500">Complete payment to publish your posts</p>
+                  </div>
+                  <span className="px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-100">
+                    {stats.pendingPayments} pending
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {mockPayments
+                    .filter((p) => p.status === "pending")
+                    .map((payment) => (
+                      <div key={payment.id} className="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50/70 px-4 py-3">
+                        <div>
+                          <p className="text-sm text-amber-700 font-semibold">{payment.vehicle}</p>
+                          <p className="text-xs text-amber-600">{payment.type.toUpperCase()} • {payment.method}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-slate-900">৳ {payment.amount}</p>
+                          <button className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-800">
+                            Pay now <ChevronRight size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </section>
+
+              <section className="bg-white rounded-3xl shadow-lg border border-slate-100 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900">Payment details</h2>
+                    <p className="text-sm text-slate-500">Recent transactions</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {mockPayments.map((payment) => (
+                    <div key={payment.id} className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{payment.vehicle}</p>
+                        <p className="text-xs text-slate-500">{payment.date}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-slate-900">৳ {payment.amount}</p>
+                        <span className={`text-xs font-semibold ${
+                          payment.status === "paid"
+                            ? "text-emerald-700"
+                            : "text-amber-700"
+                        }`}>
+                          {payment.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
-          </div>
-        </div>
-
-        {/* License File Info (if organization) */}
-        {user.role === "organization" && user.licenseFile && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-sky-100 mb-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <FileText size={24} className="text-sky-500" />
-              Organization License
-            </h2>
-            <div className="flex items-center justify-between">
-              <p className="text-slate-700">License file uploaded and verified</p>
-              <span className="px-4 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                Verified
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-sky-100">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a
-              href="/"
-              className="rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-6 py-3 text-white font-medium text-center hover:shadow-lg transition"
-            >
-              Browse Vehicles
-            </a>
-            <a
-              href="/sell"
-              className="rounded-xl border border-sky-300 px-6 py-3 text-sky-600 font-medium text-center hover:bg-sky-50 transition"
-            >
-              Sell Vehicle
-            </a>
-            <a
-              href="/settings"
-              className="rounded-xl border border-slate-300 px-6 py-3 text-slate-600 font-medium text-center hover:bg-slate-50 transition"
-            >
-              Account Settings
-            </a>
-          </div>
+          </main>
         </div>
       </div>
     </div>

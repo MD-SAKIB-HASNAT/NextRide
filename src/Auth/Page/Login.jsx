@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import apiClient from "../../api/axiosInstance";
+import LoadingSpinner from "../../Components/LoadingSpiner";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -46,24 +47,28 @@ export default function Login() {
     }
   };
 
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-slate-100 p-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-slate-100 p-3 sm:p-4">
       <motion.form
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-sky-100"
+        className="w-full max-w-md bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-6 md:p-8 border border-sky-100"
       >
         {/* Header Section */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full mb-4">
-            <LogIn className="text-white" size={24} />
+        <div className="mb-3 sm:mb-4 md:mb-6 text-center">
+          <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full mb-2 sm:mb-3">
+            <LogIn className="text-white" size={20} />
           </div>
-          <h2 className="text-4xl font-bold text-slate-900 mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-1.5">
             Welcome Back
           </h2>
-          <p className="text-base text-slate-500 leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-500">
             Login to your NextRide account
           </p>
         </div>
@@ -73,17 +78,17 @@ export default function Login() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"
+            className="mb-3 sm:mb-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"
           >
             {error}
           </motion.div>
         )}
 
         {/* Email */}
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-          <div className="relative group">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 group-focus-within:text-sky-600 transition" size={18} />
+        <div className="mb-3 sm:mb-4">
+          <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 transition" size={18} />
             <input
               type="email"
               name="email"
@@ -97,10 +102,10 @@ export default function Login() {
         </div>
 
         {/* Password */}
-        <div className="mb-6">
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-          <div className="relative group">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 group-focus-within:text-sky-600 transition" size={18} />
+        <div className="mb-4 sm:mb-5">
+          <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 transition" size={18} />
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -126,7 +131,7 @@ export default function Login() {
           whileTap={{ scale: loading ? 1 : 0.98 }}
           type="submit"
           disabled={loading}
-          className={`w-full rounded-xl py-3 text-white font-semibold shadow-lg hover:shadow-xl transition duration-200 ${
+          className={`w-full rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-white font-semibold shadow-lg hover:shadow-xl transition duration-200 ${
             loading
               ? "bg-slate-400 cursor-not-allowed"
               : "bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700"
@@ -136,7 +141,7 @@ export default function Login() {
         </motion.button>
 
         {/* Register Link */}
-        <p className="text-sm text-center mt-6 text-slate-600">
+        <p className="text-xs sm:text-sm text-center mt-4 sm:mt-5 text-slate-600">
           Don't have an account?{" "}
           <a href="/register" className="text-sky-600 font-bold hover:text-sky-700 hover:underline transition">
             Register here
@@ -144,7 +149,7 @@ export default function Login() {
         </p>
 
         {/* Forgot Password Link */}
-        <p className="text-sm text-center mt-3 text-slate-600">
+        <p className="text-xs sm:text-sm text-center mt-2 text-slate-600">
           <a href="/forgot-password" className="text-slate-500 hover:text-sky-600 hover:underline transition">
             Forgot password?
           </a>

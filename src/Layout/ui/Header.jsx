@@ -29,9 +29,9 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-white border-b border-slate-200">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
           
           <div className="flex items-center">
             <a href="/" className="flex items-center gap-2">
@@ -44,10 +44,8 @@ export default function Header() {
                 NextRide
               </span>
             </a>
-          </div>
-
-          <div className="flex justify-center">
-            <form className="w-full max-w-xl relative">
+            
+            <form className="ml-10 hidden md:block w-full max-w-xl relative">
               <input
                 type="search"
                 placeholder="Search bikes, cars, brands..."
@@ -56,6 +54,7 @@ export default function Header() {
               <button
                 type="submit"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-sky-500 text-white flex items-center justify-center"
+                aria-label="Search"
               >
                 <Search size={18} />
               </button>
