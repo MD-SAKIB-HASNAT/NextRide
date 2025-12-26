@@ -1,75 +1,91 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Bike, Car, CheckCircle, Filter, MapPin, Tag, X } from "lucide-react";
-
-const mockListings = [
-  {
-    id: "B-201",
-    title: "Yamaha R15 V4",
-    type: "bike",
-    status: "active",
-    paymentStatus: "paid",
-    price: 250000,
-    posted: "Jan 05",
-    location: "Dhaka",
-    views: 134,
-  },
-  {
-    id: "B-225",
-    title: "TVS Apache RTR 4V",
-    type: "bike",
-    status: "pending",
-    paymentStatus: "pending",
-    price: 185000,
-    posted: "Jan 12",
-    location: "Chattogram",
-    views: 42,
-  },
-  {
-    id: "C-014",
-    title: "Toyota Axio 2018",
-    type: "car",
-    status: "active",
-    paymentStatus: "paid",
-    price: 1850000,
-    posted: "Dec 28",
-    location: "Dhaka",
-    views: 89,
-  },
-  {
-    id: "C-077",
-    title: "Honda Vezel 2017",
-    type: "car",
-    status: "review",
-    paymentStatus: "pending",
-    price: 2100000,
-    posted: "Jan 02",
-    location: "Sylhet",
-    views: 51,
-  },
-];
-
-const badgeClass = (status) => {
-  if (status === "active") return "bg-emerald-100 text-emerald-700";
-  if (status === "review") return "bg-amber-100 text-amber-700";
-  return "bg-slate-100 text-slate-700";
-};
+import apiClient from "../../../api/axiosInstance";
+import LoadingSpinner from "../../../Components/LoadingSpiner";
+import HashLoader from "react-spinners/HashLoader";
 
 export default function MyListings() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialType = searchParams.get("type") || "all";
   const [typeFilter, setTypeFilter] = useState(initialType);
-  const [paymentFilter, setPaymentFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState("");
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+
+  useEffect(() => {
+    const fetchMyListings = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams({
+          limit: '12',
+        });
+        
+        // Only add filters if not 'all'
+        if (typeFilter !== 'all') {
+          params.append('vehicleType', typeFilter);
+        }
+        if (statusFilter !== 'all') {
+          params.append('status', statusFilter);
+        }
+        
+        console.log('Filters:', { typeFilter, statusFilter });
+        console.log('API URL:', `/vehicles/user/my-listings-filtered?${params}`);
+        
+        const { data } = await apiClient.get(`/vehicles/user/my-listings-filtered?${params}`);
+        console.log('Response:', data);
+        
+        setListings(data.data || []);
+        setNextCursor(data.nextCursor);
+        setHasMore(data.hasMore);
+      } catch (err) {
+        console.error('Error fetching listings:', err);
+        setError(err.response?.data?.message || "Failed to load listings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyListings();
+  }, [typeFilter, statusFilter]);
+
+  const loadMore = async () => {
+    if (!hasMore || loadingMore) return;
+    
+    try {
+      setLoadingMore(true);
+      const params = new URLSearchParams({
+        limit: '12',
+        cursor: nextCursor,
+      });
+      
+      // Only add filters if not 'all'
+      if (typeFilter !== 'all') {
+        params.append('vehicleType', typeFilter);
+      }
+      if (statusFilter !== 'all') {
+        params.append('status', statusFilter);
+      }
+      
+      const { data } = await apiClient.get(`/vehicles/user/my-listings-filtered?${params}`);
+      setListings(prev => [...prev, ...(data.data || [])]);
+      setNextCursor(data.nextCursor);
+      setHasMore(data.hasMore);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load more listings");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const filteredListings = useMemo(() => {
-    return mockListings.filter((item) => {
-      const matchesType = typeFilter === "all" || item.type === typeFilter;
-      const matchesPayment =
-        paymentFilter === "all" || item.paymentStatus === paymentFilter;
-      return matchesType && matchesPayment;
-    });
-  }, [typeFilter, paymentFilter]);
+    return listings;
+  }, [listings]);
 
   const updateType = (value) => {
     setTypeFilter(value);
@@ -81,6 +97,21 @@ export default function MyListings() {
     setSearchParams(searchParams);
   };
 
+  const badgeClass = (status) => {
+    if (status === "active") return "bg-emerald-100 text-emerald-700";
+    if (status === "review") return "bg-amber-100 text-amber-700";
+    return "bg-slate-100 text-slate-700";
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 py-8 lg:px-8">
@@ -88,7 +119,7 @@ export default function MyListings() {
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-500">Listings</p>
             <h1 className="text-3xl font-bold text-slate-900">My Vehicle Posts</h1>
-            <p className="text-sm text-slate-500">Filter by type and payment status</p>
+            <p className="text-sm text-slate-500">Filter by type and listing status</p>
           </div>
           <button
             onClick={() => navigate(-1)}
@@ -113,22 +144,24 @@ export default function MyListings() {
           </div>
           <select
             className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm font-medium text-slate-700 shadow-sm"
-            value={paymentFilter}
-            onChange={(e) => setPaymentFilter(e.target.value)}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="all">Any payment</option>
-            <option value="paid">Paid</option>
+            <option value="all">Any status</option>
             <option value="pending">Pending</option>
+            <option value="active">Active</option>
+            <option value="rejected">Rejected</option>
+            <option value="sold">Sold</option>
           </select>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredListings.map((item) => (
-            <div key={item.id} className="rounded-2xl border border-slate-100 bg-gradient-to-br from-white to-slate-50 shadow-sm p-4 flex flex-col gap-3">
+            <div key={item._id} className="rounded-2xl border border-slate-100 bg-gradient-to-br from-white to-slate-50 shadow-sm p-4 flex flex-col gap-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">{item.id}</p>
-                  <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                  <p className="text-xs uppercase tracking-wide text-slate-400">{item._id.slice(-6)}</p>
+                  <h3 className="text-lg font-semibold text-slate-900">{item.make} {item.modelName}</h3>
                   <p className="text-sm text-slate-500 flex items-center gap-1">
                     <MapPin size={14} className="text-blue-500" /> {item.location}
                   </p>
@@ -142,7 +175,7 @@ export default function MyListings() {
                 <span className="inline-flex items-center gap-1 font-semibold text-slate-800">
                   <Tag size={14} className="text-amber-500" /> ৳ {item.price.toLocaleString()}
                 </span>
-                <span className="text-slate-500">Views: {item.views}</span>
+                <span className="text-slate-500 capitalize">{item.vehicleType}</span>
               </div>
 
               <div className="flex items-center justify-between text-sm">
@@ -153,11 +186,30 @@ export default function MyListings() {
                 }`}>
                   <CheckCircle size={14} /> {item.paymentStatus === "paid" ? "Payment received" : "Payment pending"}
                 </span>
-                <span className="text-slate-500">Posted {item.posted}</span>
+                <span className="text-slate-500">Posted {formatDate(item.createdAt)}</span>
               </div>
             </div>
           ))}
         </div>
+
+        {hasMore && (
+          <div className="mt-8 text-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="px-6 py-3 rounded-xl bg-sky-500 text-white font-semibold hover:bg-sky-600 disabled:bg-slate-400 disabled:cursor-not-allowed transition inline-flex items-center gap-2"
+            >
+              {loadingMore ? (
+                <>
+                  <HashLoader color="#ffffff" size={18} />
+                  Loading...
+                </>
+              ) : (
+                "Load More"
+              )}
+            </button>
+          </div>
+        )}
 
         {filteredListings.length === 0 && (
           <div className="mt-8 text-center text-slate-500">No listings found for this filter.</div>

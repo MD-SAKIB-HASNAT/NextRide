@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import apiClient from "../../api/axiosInstance";
 import LoadingSpinner from "../../Components/LoadingSpiner";
+import HashLoader from "react-spinners/HashLoader";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -137,7 +138,14 @@ export default function Login() {
               : "bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700"
           }`}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <HashLoader color="#ffffff" size={16} />
+              Logging in...
+            </span>
+          ) : (
+            "Login"
+          )}
         </motion.button>
 
         {/* Register Link */}

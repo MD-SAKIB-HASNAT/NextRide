@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 import LoadingSpinner from "../../../Components/LoadingSpiner";
+import HashLoader from "react-spinners/HashLoader";
 
 const brandsByType = {
   car: [
@@ -193,7 +194,7 @@ export default function SellVehicle() {
       });
 
       setStep("success");
-      setTimeout(() => navigate("/"), 3000);
+      setTimeout(() => navigate("/dashboard"), 3000);
     } catch (err) {
       setError(
         err.response?.data?.message || "Failed to post vehicle listing"
@@ -677,7 +678,7 @@ export default function SellVehicle() {
           </p>
 
           <div className="inline-block">
-            <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
+            <HashLoader color="#0ea5e9" size={40} />
           </div>
         </div>
       </div>

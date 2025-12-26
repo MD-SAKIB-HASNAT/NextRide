@@ -12,88 +12,21 @@ import {
   Shield,
   User,
 } from "lucide-react";
+import apiClient from "../../../api/axiosInstance";
 
+import LoadingSpinner from "../../../Components/LoadingSpiner";
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState([]);
+  const [stats, setStats] = useState({
+    bikeCount: 0,
+    carCount: 0,
+    totalCount: 0,
+    pendingCount: 0,
+  });
 
-  const mockListings = [
-    {
-      id: "B-201",
-      title: "Yamaha R15 V4",
-      type: "bike",
-      status: "active",
-      paymentStatus: "paid",
-      price: 250000,
-      posted: "Jan 05",
-      location: "Dhaka",
-      views: 134,
-    },
-    {
-      id: "B-225",
-      title: "TVS Apache RTR 4V",
-      type: "bike",
-      status: "pending",
-      paymentStatus: "pending",
-      price: 185000,
-      posted: "Jan 12",
-      location: "Chattogram",
-      views: 42,
-    },
-    {
-      id: "C-014",
-      title: "Toyota Axio 2018",
-      type: "car",
-      status: "active",
-      paymentStatus: "paid",
-      price: 1850000,
-      posted: "Dec 28",
-      location: "Dhaka",
-      views: 89,
-    },
-    {
-      id: "C-077",
-      title: "Honda Vezel 2017",
-      type: "car",
-      status: "review",
-      paymentStatus: "pending",
-      price: 2100000,
-      posted: "Jan 02",
-      location: "Sylhet",
-      views: 51,
-    },
-  ];
-
-  const mockPayments = [
-    {
-      id: "PMT-9821",
-      vehicle: "Toyota Axio",
-      type: "car",
-      amount: 1250,
-      status: "pending",
-      method: "Card",
-      date: "Jan 12, 2025",
-    },
-    {
-      id: "PMT-9822",
-      vehicle: "Yamaha R15 V4",
-      type: "bike",
-      amount: 680,
-      status: "paid",
-      method: "bKash",
-      date: "Jan 10, 2025",
-    },
-    {
-      id: "PMT-9823",
-      vehicle: "Honda Vezel",
-      type: "car",
-      amount: 1490,
-      status: "paid",
-      method: "Nagad",
-      date: "Dec 30, 2024",
-    },
-  ];
 
   useEffect(() => {
     // Check if user is logged in
@@ -106,7 +39,40 @@ export default function Dashboard() {
     }
 
     setUser(userData);
-    setLoading(false);
+    
+    // Fetch user summary, user profile, and recent listings from backend
+    const fetchUserData = async () => {
+      try {
+        const userId = userData._id || userData.id;
+        const [userRes, summaryRes, listingsRes] = await Promise.all([
+          apiClient.get(`/user/${userId}`),
+          apiClient.get("/vehicles/user/summary"),
+          apiClient.get("/vehicles/user/my-listings?limit=50")
+        ]);
+
+        // Update user state and localStorage with fresh data
+        const freshUserData = userRes.data;
+        setUser(freshUserData);
+        localStorage.setItem("user", JSON.stringify(freshUserData));
+
+        const summary = summaryRes.data || {};
+        const userListings = listingsRes.data?.data || [];
+        
+        setListings(userListings);
+        setStats({
+          bikeCount: summary.bikePostCount ?? 0,
+          carCount: summary.carPostCount ?? 0,
+          totalCount: summary.totalListings ?? 0,
+          pendingCount: summary.pendingCount ?? 0,
+        });
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -116,28 +82,12 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) {
     return null;
   }
-
-  const stats = {
-    bikeCount: mockListings.filter((i) => i.type === "bike").length,
-    carCount: mockListings.filter((i) => i.type === "car").length,
-    pendingPayments: mockPayments.filter((p) => p.status === "pending").length,
-    paidTotal: mockPayments
-      .filter((p) => p.status === "paid")
-      .reduce((sum, p) => sum + p.amount, 0),
-  };
 
   const handleStatClick = (targetType) => {
     navigate(`/my-listings?type=${targetType}`);
@@ -149,8 +99,16 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
           <aside className="lg:col-span-2 xl:col-span-2 bg-white rounded-3xl shadow-lg border border-slate-100 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-slate-700 flex items-center justify-center text-white text-xl font-semibold shadow-lg">
-                {user.name?.slice(0, 1) || "N"}
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-slate-700 flex items-center justify-center text-white text-xl font-semibold shadow-lg overflow-hidden">
+                {user.profilePhoto ? (
+                  <img 
+                    src={`${import.meta.env.VITE_API_URL}/${user.profilePhoto}`}
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  user.name?.slice(0, 1) || "N"
+                )}
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">Dashboard</p>
@@ -179,6 +137,13 @@ export default function Dashboard() {
             </div>
 
             <button
+              onClick={() => navigate("/edit-profile")}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 px-4 py-3 font-semibold hover:bg-blue-100 transition"
+            >
+              <User size={16} /> Edit Profile
+            </button>
+
+            <button
               onClick={handleLogout}
               className="mt-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-red-50 text-red-600 border border-red-100 px-4 py-3 font-semibold hover:bg-red-100 transition"
             >
@@ -197,15 +162,15 @@ export default function Dashboard() {
                   <p className="text-sm text-blue-100">My posts</p>
                   <Activity size={22} />
                 </div>
-                <h3 className="text-3xl font-bold mt-2">{stats.bikeCount + stats.carCount}</h3>
+                <h3 className="text-3xl font-bold mt-2">{stats.totalCount}</h3>
                 <p className="text-xs text-blue-200 mt-1">{stats.bikeCount} bikes • {stats.carCount} cars</p>
               </button>
               <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-500">Pending payments</p>
-                  <CreditCard size={22} className="text-orange-500" />
+                  <p className="text-sm text-slate-500">Total Listings</p>
+                  <Activity size={22} className="text-sky-500" />
                 </div>
-                <h3 className="text-3xl font-bold text-slate-900 mt-2">{stats.pendingPayments}</h3>
+                <h3 className="text-3xl font-bold text-slate-900 mt-2">{stats.totalCount}</h3>
               </div>
             </div>
 
@@ -214,30 +179,51 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-slate-900">Pending payments</h2>
-                    <p className="text-sm text-slate-500">Complete payment to publish your posts</p>
+                    <p className="text-sm text-slate-500">Latest pending posts (max 3)</p>
                   </div>
-                  <span className="px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-100">
-                    {stats.pendingPayments} pending
-                  </span>
+                  <button
+                    onClick={() => navigate("/pending-payments")}
+                    className="px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-100 hover:bg-amber-100 transition cursor-pointer"
+                  >
+                    {stats.pendingCount} pending
+                  </button>
                 </div>
 
                 <div className="space-y-3">
-                  {mockPayments
-                    .filter((p) => p.status === "pending")
-                    .map((payment) => (
-                      <div key={payment.id} className="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50/70 px-4 py-3">
+                  {listings
+                    .filter((p) => p.paymentStatus === "PENDING")
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .slice(0, 3)
+                    .map((l) => (
+                      <div key={l._id || l.id} className="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50/80 px-4 py-3 shadow-sm">
                         <div>
-                          <p className="text-sm text-amber-700 font-semibold">{payment.vehicle}</p>
-                          <p className="text-xs text-amber-600">{payment.type.toUpperCase()} • {payment.method}</p>
+                          <p className="text-sm text-amber-800 font-semibold">{l.make ? `${l.make} ${l.modelName || ""}`.trim() : l.modelName || "Untitled"}</p>
+                          <p className="text-xs text-amber-700">{l.vehicleType?.toUpperCase()} • ৳ {l.price?.toLocaleString() || 0}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-slate-900">৳ {payment.amount}</p>
-                          <button className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-800">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded-full border border-amber-200">Pending</span>
+                          <button
+                            onClick={() => navigate(`/payment/${l._id || l.id}`)}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-800 bg-white hover:bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 transition"
+                          >
                             Pay now <ChevronRight size={14} />
                           </button>
                         </div>
                       </div>
                     ))}
+
+                  {stats.pendingCount === 0 && (
+                    <div className="text-center py-6 text-slate-500 text-sm">No pending payments</div>
+                  )}
+
+                  {stats.pendingCount > 3 && (
+                    <button
+                      onClick={() => navigate("/pending-payments")}
+                      className="w-full mt-3 inline-flex items-center justify-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2.5 rounded-xl border border-sky-100 transition"
+                    >
+                      See all {stats.pendingCount} pending posts <ChevronRight size={16} />
+                    </button>
+                  )}
                 </div>
               </section>
 
@@ -248,26 +234,7 @@ export default function Dashboard() {
                     <p className="text-sm text-slate-500">Recent transactions</p>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  {mockPayments.map((payment) => (
-                    <div key={payment.id} className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{payment.vehicle}</p>
-                        <p className="text-xs text-slate-500">{payment.date}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-slate-900">৳ {payment.amount}</p>
-                        <span className={`text-xs font-semibold ${
-                          payment.status === "paid"
-                            ? "text-emerald-700"
-                            : "text-amber-700"
-                        }`}>
-                          {payment.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <div className="space-y-3 text-sm text-slate-500">No transactions to show</div>
               </section>
             </div>
           </main>
