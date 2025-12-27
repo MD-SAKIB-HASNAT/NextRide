@@ -12,8 +12,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
-import LoadingSpinner from "../../../Components/LoadingSpiner";
-import HashLoader from "react-spinners/HashLoader";
+import LoadingSpinner from "../../../LoadingSpinner/LoadingSpinner";
 import VehicleCard from "../../../Components/VehicleCard";
 
 export default function SellerProfile() {
@@ -196,10 +195,7 @@ export default function SellerProfile() {
 
           {vehiclesLoading ? (
             <div className="py-12 text-center">
-              <div className="mx-auto mb-2 inline-block">
-                <HashLoader color="#0ea5e9" size={45} />
-              </div>
-              <p className="text-slate-500 mt-2">Loading listings...</p>
+              <LoadingSpinner />
             </div>
           ) : vehicles.length === 0 ? (
             <div className="py-16 text-center">

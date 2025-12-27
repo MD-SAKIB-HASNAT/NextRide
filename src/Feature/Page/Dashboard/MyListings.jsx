@@ -2,8 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Bike, Car, CheckCircle, Filter, MapPin, Tag, X } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
-import LoadingSpinner from "../../../Components/LoadingSpiner";
-import HashLoader from "react-spinners/HashLoader";
+import LoadingSpinner from "../../../LoadingSpinner/LoadingSpinner";
 
 export default function MyListings() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,11 +33,11 @@ export default function MyListings() {
           params.append('status', statusFilter);
         }
         
-        console.log('Filters:', { typeFilter, statusFilter });
-        console.log('API URL:', `/vehicles/user/my-listings-filtered?${params}`);
+        //console.log('Filters:', { typeFilter, statusFilter });
+        //console.log('API URL:', `/vehicles/filtered-listings?${params}`);
         
-        const { data } = await apiClient.get(`/vehicles/user/my-listings-filtered?${params}`);
-        console.log('Response:', data);
+        const { data } = await apiClient.get(`/vehicles/filtered-listings?${params}`);
+        //console.log('Response:', data);
         
         setListings(data.data || []);
         setNextCursor(data.nextCursor);
@@ -72,7 +71,7 @@ export default function MyListings() {
         params.append('status', statusFilter);
       }
       
-      const { data } = await apiClient.get(`/vehicles/user/my-listings-filtered?${params}`);
+      const { data } = await apiClient.get(`/vehicles/filtered-listings?${params}`);
       setListings(prev => [...prev, ...(data.data || [])]);
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore);
@@ -199,14 +198,7 @@ export default function MyListings() {
               disabled={loadingMore}
               className="px-6 py-3 rounded-xl bg-sky-500 text-white font-semibold hover:bg-sky-600 disabled:bg-slate-400 disabled:cursor-not-allowed transition inline-flex items-center gap-2"
             >
-              {loadingMore ? (
-                <>
-                  <HashLoader color="#ffffff" size={18} />
-                  Loading...
-                </>
-              ) : (
-                "Load More"
-              )}
+              {loadingMore ? "Loading..." : "Load More"}
             </button>
           </div>
         )}

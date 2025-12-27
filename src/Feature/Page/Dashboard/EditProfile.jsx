@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Phone, Save, X, ArrowLeft, Camera, Lock } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
-import HashLoader from "react-spinners/HashLoader";
+import LoadingSpinner from "../../../LoadingSpinner/LoadingSpinner";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -163,11 +163,7 @@ const EditProfile = () => {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <HashLoader color="#2563eb" size={48} />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -288,9 +284,8 @@ const EditProfile = () => {
               {loading ? (
                 <>
                   <div className="flex items-center justify-center">
-                    <HashLoader color="#ffffff" size={20} />
+                    Updating...
                   </div>
-                  <span>Updating...</span>
                 </>
               ) : (
                 <>
@@ -361,10 +356,7 @@ const EditProfile = () => {
                   className="w-full bg-slate-700 text-white py-3 rounded-xl font-semibold hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <>
-                      <HashLoader color="#ffffff" size={18} />
-                      Updating...
-                    </>
+                    "Updating..."
                   ) : (
                     <>
                       <Lock size={18} />

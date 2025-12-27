@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Car,
@@ -12,10 +12,10 @@ import {
   Image,
   Video,
   X,
+  Lock,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
-import LoadingSpinner from "../../../Components/LoadingSpiner";
-import HashLoader from "react-spinners/HashLoader";
+import LoadingSpinner from "../../../LoadingSpinner/LoadingSpinner";
 
 const brandsByType = {
   car: [
@@ -57,6 +57,10 @@ export default function SellVehicle() {
   const navigate = useNavigate();
 
   const [step, setStep] = useState("form");
+  const [newListingId, setNewListingId] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [authenticating, setAuthenticating] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [form, setForm] = useState({
     vehicleType: "car",
     make: "Toyota",
@@ -76,6 +80,18 @@ export default function SellVehicle() {
   const [error, setError] = useState("");
   const [imagePreview, setImagePreview] = useState([]);
   const [videoPreview, setVideoPreview] = useState(null);
+
+  // Check authentication
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      setIsAuthenticated(false);
+      setAuthenticating(false);
+      return;
+    }
+    setIsAuthenticated(true);
+    setAuthenticating(false);
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -187,14 +203,15 @@ export default function SellVehicle() {
         formData.append("video", form.video);
       }
 
-      await apiClient.post("/vehicles/sell", formData, {
+      const { data } = await apiClient.post("/vehicles/sell", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
+      const listingId = data?._id || data?.id;
+      setNewListingId(listingId);
       setStep("success");
-      setTimeout(() => navigate("/dashboard"), 3000);
+      setShowPaymentModal(true);
     } catch (err) {
       setError(
         err.response?.data?.message || "Failed to post vehicle listing"
@@ -207,6 +224,45 @@ export default function SellVehicle() {
 
   if (loading) {
     return <LoadingSpinner />;
+  }
+
+  if (authenticating) {
+    return <LoadingSpinner />;
+  }
+
+  // Show login required message
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-slate-100 p-4">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-sky-100 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full mb-6">
+            <Lock className="text-white" size={36} />
+          </div>
+          
+          <h2 className="text-3xl font-bold text-slate-900 mb-3">
+            Login Required
+          </h2>
+          <p className="text-slate-600 mb-6 text-lg">
+            You need to login to sell your vehicle on NextRide
+          </p>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-lg"
+            >
+              Go to Login
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (step === "form") {
@@ -674,13 +730,53 @@ export default function SellVehicle() {
             Listing Posted!
           </h2>
           <p className="text-sm sm:text-base text-slate-500 mb-5 sm:mb-6 px-2">
-            Your vehicle listing has been successfully posted. Redirecting home...
+            Your vehicle listing has been successfully posted.
           </p>
 
-          <div className="inline-block">
-            <HashLoader color="#0ea5e9" size={40} />
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="flex-1 rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-slate-700 font-semibold border-2 border-slate-300 hover:border-slate-400 transition"
+            >
+              Go to Dashboard
+            </button>
+            {newListingId && (
+              <button
+                onClick={() => navigate(`/payment/${newListingId}`)}
+                className="flex-1 rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-white font-semibold shadow-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-600 transition"
+              >
+                Pay Now
+              </button>
+            )}
           </div>
         </div>
+        {showPaymentModal && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Complete Payment</h3>
+              <p className="text-sm text-slate-600 mb-4">Activate your listing by paying now, or pay later from your dashboard.</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="flex-1 rounded-xl py-2.5 text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+                >
+                  Pay Later
+                </button>
+                {newListingId && (
+                  <button
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      navigate(`/payment/${newListingId}`);
+                    }}
+                    className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-600"
+                  >
+                    Pay Now
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

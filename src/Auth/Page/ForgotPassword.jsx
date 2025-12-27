@@ -23,7 +23,9 @@ export default function ForgotPassword() {
       setStep("otp");
       setOtp("");
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to send OTP");
+      setError(
+        err.response?.data?.message || err.message || "Failed to send OTP"
+      );
     } finally {
       setLoading(false);
     }
@@ -68,7 +70,9 @@ export default function ForgotPassword() {
       setSuccess("Password reset successful. You can now log in.");
       setStep("success");
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to reset password");
+      setError(
+        err.response?.data?.message || err.message || "Failed to reset password"
+      );
     } finally {
       setLoading(false);
     }
@@ -112,7 +116,9 @@ export default function ForgotPassword() {
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full mb-4">
               <Mail className="text-white" size={24} />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Forgot Password</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Forgot Password
+            </h2>
             <p className="text-base text-slate-500 leading-relaxed">
               Enter your email and we'll send an OTP to reset your password.
             </p>
@@ -121,9 +127,14 @@ export default function ForgotPassword() {
           {renderAlert()}
 
           <div className="mb-5">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Email
+            </label>
             <div className="relative group">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 group-focus-within:text-sky-600 transition" size={18} />
+              <Mail
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 group-focus-within:text-sky-600 transition"
+                size={18}
+              />
               <input
                 type="email"
                 required
@@ -151,7 +162,10 @@ export default function ForgotPassword() {
 
           <p className="text-sm text-center mt-6 text-slate-600">
             Remember your password?{" "}
-            <a href="/login" className="text-sky-600 font-bold hover:text-sky-700 hover:underline transition">
+            <a
+              href="/login"
+              className="text-sky-600 font-bold hover:text-sky-700 hover:underline transition"
+            >
               Back to Login
             </a>
           </p>
@@ -175,20 +189,27 @@ export default function ForgotPassword() {
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full mb-4">
               <Mail className="text-white" size={24} />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Verify OTP</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Verify OTP
+            </h2>
             <p className="text-base text-slate-500 leading-relaxed">
-              Enter the 6-digit OTP sent to <span className="font-semibold text-slate-700">{email}</span>
+              Enter the 6-digit OTP sent to{" "}
+              <span className="font-semibold text-slate-700">{email}</span>
             </p>
           </div>
 
           {renderAlert()}
 
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">Enter OTP</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-3">
+              Enter OTP
+            </label>
             <input
               type="text"
               value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              onChange={(e) =>
+                setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
               maxLength="6"
               placeholder="000000"
               className="w-full text-center text-3xl font-bold tracking-widest rounded-xl border-2 border-slate-300 py-4 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
@@ -239,7 +260,9 @@ export default function ForgotPassword() {
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full mb-4">
               <Lock className="text-white" size={24} />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Set New Password</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Set New Password
+            </h2>
             <p className="text-base text-slate-500 leading-relaxed">
               Enter your new password below.
             </p>
@@ -248,24 +271,32 @@ export default function ForgotPassword() {
           {renderAlert()}
 
           <div className="mb-5">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">New Password</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              New Password
+            </label>
             <input
               type="password"
               required
               value={form.newPassword}
-              onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, newPassword: e.target.value })
+              }
               placeholder="Enter new password"
               className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
             />
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm Password</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Confirm Password
+            </label>
             <input
               type="password"
               required
               value={form.confirmPassword}
-              onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, confirmPassword: e.target.value })
+              }
               placeholder="Confirm new password"
               className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
             />
@@ -291,29 +322,27 @@ export default function ForgotPassword() {
 
   // Step: success
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-slate-100 p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-green-100 text-center"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-green-100 text-center"
+    >
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mb-6">
+        <span className="text-white text-2xl font-bold">✓</span>
+      </div>
+
+      <h2 className="text-3xl font-bold text-slate-900 mb-2">Password Reset</h2>
+      <p className="text-base text-slate-500 leading-relaxed mb-8">
+        Your password has been reset successfully. You can now log in.
+      </p>
+
+      <a
+        href="/login"
+        className="inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-3 text-white font-semibold hover:bg-sky-700 transition"
       >
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mb-6">
-          <span className="text-white text-2xl font-bold">✓</span>
-        </div>
-
-        <h2 className="text-3xl font-bold text-slate-900 mb-2">Password Reset</h2>
-        <p className="text-base text-slate-500 leading-relaxed mb-8">
-          Your password has been reset successfully. You can now log in.
-        </p>
-
-        <a
-          href="/login"
-          className="inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-3 text-white font-semibold hover:bg-sky-700 transition"
-        >
-          Go to Login
-        </a>
-      </motion.div>
-    </div>
+        Go to Login
+      </a>
+    </motion.div>
   );
 }

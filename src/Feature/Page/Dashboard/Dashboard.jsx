@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Activity,
-  Bike,
-  Car,
-  ChevronRight,
   CreditCard,
   LogOut,
   Mail,
@@ -19,7 +16,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [listings, setListings] = useState([]);
   const [stats, setStats] = useState({
     bikeCount: 0,
     carCount: 0,
@@ -40,25 +36,13 @@ export default function Dashboard() {
 
     setUser(userData);
     
-    // Fetch user summary, user profile, and recent listings from backend
+    // Fetch user summary from backend
     const fetchUserData = async () => {
       try {
-        const userId = userData._id || userData.id;
-        const [userRes, summaryRes, listingsRes] = await Promise.all([
-          apiClient.get(`/user/${userId}`),
-          apiClient.get("/vehicles/user/summary"),
-          apiClient.get("/vehicles/user/my-listings?limit=50")
-        ]);
-
-        // Update user state and localStorage with fresh data
-        const freshUserData = userRes.data;
-        setUser(freshUserData);
-        localStorage.setItem("user", JSON.stringify(freshUserData));
-
+        const summaryRes = await apiClient.get("/user/summary");
         const summary = summaryRes.data || {};
-        const userListings = listingsRes.data?.data || [];
+        console.log(summary);
         
-        setListings(userListings);
         setStats({
           bikeCount: summary.bikePostCount ?? 0,
           carCount: summary.carPostCount ?? 0,
@@ -66,7 +50,7 @@ export default function Dashboard() {
           pendingCount: summary.pendingCount ?? 0,
         });
       } catch (err) {
-        console.error("Failed to fetch user data:", err);
+        console.error("Failed to fetch user summary:", err);
       } finally {
         setLoading(false);
       }
@@ -174,68 +158,18 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <section className="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 xl:col-span-2">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900">Pending payments</h2>
-                    <p className="text-sm text-slate-500">Latest pending posts (max 3)</p>
-                  </div>
-                  <button
-                    onClick={() => navigate("/pending-payments")}
-                    className="px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-100 hover:bg-amber-100 transition cursor-pointer"
-                  >
-                    {stats.pendingCount} pending
-                  </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => navigate("/pending-payments")}
+                className="text-left bg-white rounded-3xl shadow-lg p-6 border border-slate-100 hover:-translate-y-0.5 transition transform cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500">Pending Payments</p>
+                  <CreditCard size={22} className="text-amber-600" />
                 </div>
-
-                <div className="space-y-3">
-                  {listings
-                    .filter((p) => p.paymentStatus === "PENDING")
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .slice(0, 3)
-                    .map((l) => (
-                      <div key={l._id || l.id} className="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50/80 px-4 py-3 shadow-sm">
-                        <div>
-                          <p className="text-sm text-amber-800 font-semibold">{l.make ? `${l.make} ${l.modelName || ""}`.trim() : l.modelName || "Untitled"}</p>
-                          <p className="text-xs text-amber-700">{l.vehicleType?.toUpperCase()} • ৳ {l.price?.toLocaleString() || 0}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded-full border border-amber-200">Pending</span>
-                          <button
-                            onClick={() => navigate(`/payment/${l._id || l.id}`)}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-800 bg-white hover:bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 transition"
-                          >
-                            Pay now <ChevronRight size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-
-                  {stats.pendingCount === 0 && (
-                    <div className="text-center py-6 text-slate-500 text-sm">No pending payments</div>
-                  )}
-
-                  {stats.pendingCount > 3 && (
-                    <button
-                      onClick={() => navigate("/pending-payments")}
-                      className="w-full mt-3 inline-flex items-center justify-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2.5 rounded-xl border border-sky-100 transition"
-                    >
-                      See all {stats.pendingCount} pending posts <ChevronRight size={16} />
-                    </button>
-                  )}
-                </div>
-              </section>
-
-              <section className="bg-white rounded-3xl shadow-lg border border-slate-100 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900">Payment details</h2>
-                    <p className="text-sm text-slate-500">Recent transactions</p>
-                  </div>
-                </div>
-                <div className="space-y-3 text-sm text-slate-500">No transactions to show</div>
-              </section>
+                <h3 className="text-3xl font-bold text-slate-900 mt-2">{stats.pendingCount}</h3>
+              </button>
             </div>
           </main>
         </div>

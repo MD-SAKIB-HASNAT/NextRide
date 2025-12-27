@@ -7,6 +7,7 @@ import {
   MapPin,
   Tag,
   ChevronRight,
+  Filter,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 import LoadingSpinner from "../../../Components/LoadingSpiner";
@@ -19,49 +20,72 @@ export default function PendingPayments() {
   const [nextCursor, setNextCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState("");
+  const [filters, setFilters] = useState({
+    vehicleType: "",
+    fromDate: "",
+    toDate: "",
+  });
+
+  const fetchPendingPayments = async (newFilters = null, isLoadMore = false) => {
+    try {
+      !isLoadMore && setLoading(true);
+      if (isLoadMore) setLoadingMore(true);
+
+      const filtersToUse = newFilters || filters;
+      const params = new URLSearchParams({
+        limit: '12',
+        paymentStatus: 'pending',
+      });
+
+      if (filtersToUse.vehicleType) params.append('vehicleType', filtersToUse.vehicleType);
+      if (filtersToUse.fromDate) params.append('fromDate', filtersToUse.fromDate);
+      if (filtersToUse.toDate) params.append('toDate', filtersToUse.toDate);
+      if (isLoadMore && nextCursor) params.append('cursor', nextCursor);
+
+      const { data } = await apiClient.get(`/vehicles/filtered-listings?${params}`);
+      
+      if (isLoadMore) {
+        setPendingListings(prev => [...prev, ...(data.data || [])]);
+      } else {
+        setPendingListings(data.data || []);
+      }
+      setNextCursor(data.nextCursor);
+      setHasMore(data.hasMore);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load pending payments");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPendingPayments = async () => {
-      try {
-        setLoading(true);
-        const params = new URLSearchParams({
-          limit: '12',
-          paymentStatus: 'pending',
-        });
-        const { data } = await apiClient.get(`/vehicles/user/my-listings-filtered?${params}`);
-        
-        setPendingListings(data.data || []);
-        setNextCursor(data.nextCursor);
-        setHasMore(data.hasMore);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to load pending payments");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPendingPayments();
   }, []);
 
   const loadMore = async () => {
     if (!hasMore || loadingMore) return;
-    
-    try {
-      setLoadingMore(true);
-      const params = new URLSearchParams({
-        limit: '12',
-        cursor: nextCursor,
-        paymentStatus: 'pending',
-      });
-      const { data } = await apiClient.get(`/vehicles/user/my-listings-filtered?${params}`);
-      setPendingListings(prev => [...prev, ...(data.data || [])]);
-      setNextCursor(data.nextCursor);
-      setHasMore(data.hasMore);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load more listings");
-    } finally {
-      setLoadingMore(false);
-    }
+    await fetchPendingPayments(null, true);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const applyFilters = () => {
+    setPendingListings([]);
+    setNextCursor(null);
+    setHasMore(false);
+    fetchPendingPayments(filters);
+  };
+
+  const clearFilters = () => {
+    const emptyFilters = { vehicleType: "", fromDate: "", toDate: "" };
+    setFilters(emptyFilters);
+    setPendingListings([]);
+    setNextCursor(null);
+    fetchPendingPayments(emptyFilters);
   };
 
   const formatDate = (dateString) => {
@@ -113,6 +137,77 @@ export default function PendingPayments() {
             {error}
           </div>
         )}
+
+        {/* Filters */}
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter size={20} className="text-slate-600" />
+            <h2 className="text-lg font-semibold text-slate-900">Filters</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Vehicle Type */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Vehicle Type
+              </label>
+              <select
+                name="vehicleType"
+                value={filters.vehicleType}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
+              >
+                <option value="">All Types</option>
+                <option value="bike">Bike</option>
+                <option value="car">Car</option>
+              </select>
+            </div>
+
+            {/* From Date */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                From Date
+              </label>
+              <input
+                type="date"
+                name="fromDate"
+                value={filters.fromDate}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
+
+            {/* To Date */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                To Date
+              </label>
+              <input
+                type="date"
+                name="toDate"
+                value={filters.toDate}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
+          </div>
+
+          {/* Filter Actions */}
+          <div className="flex gap-3 mt-4">
+            <button
+              onClick={applyFilters}
+              className="px-6 py-2 rounded-lg bg-sky-500 text-white font-semibold hover:bg-sky-600 transition"
+            >
+              Apply Filters
+            </button>
+            <button
+              onClick={clearFilters}
+              className="px-6 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
 
         {/* Pending Listings */}
         {pendingListings.length === 0 ? (

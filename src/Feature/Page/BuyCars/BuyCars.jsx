@@ -48,6 +48,8 @@ export default function Cars() {
 
       const filtersToUse = newFilters || filters;
       const params = new URLSearchParams();
+      params.append("vehicleType", "car");
+      params.append("status", "active");
 
       // Add filter parameters
       if (filtersToUse.search) params.append("search", filtersToUse.search);
@@ -60,11 +62,7 @@ export default function Cars() {
       params.append("limit", "12");
       if (isLoadMore && nextCursor) params.append("cursor", nextCursor);
 
-      const endpoint = Object.keys(filtersToUse).some(
-        (key) => filtersToUse[key] && key !== "search"
-      )
-        ? `/vehicles/type/car/filter?${params.toString()}`
-        : `/vehicles/type/car?${params.toString()}`;
+      const endpoint = `/vehicles/filtered-listings?${params.toString()}`;
 
       const { data } = await apiClient.get(endpoint);
 
@@ -202,7 +200,7 @@ export default function Cars() {
               {/* Price Range */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-3">
-                  Price Range (PKR)
+                  Price Range (BDT)
                 </label>
                 <div className="flex gap-2">
                   <input
