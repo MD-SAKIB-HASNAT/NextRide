@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Car,
   Upload,
@@ -55,12 +55,15 @@ const brandsByType = {
 
 export default function SellVehicle() {
   const navigate = useNavigate();
+  const { id: vehicleId } = useParams();
+  const isEditMode = !!vehicleId;
 
   const [step, setStep] = useState("form");
   const [newListingId, setNewListingId] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [existingVehicle, setExistingVehicle] = useState(null);
   const [form, setForm] = useState({
     vehicleType: "car",
     make: "Toyota",
@@ -81,7 +84,7 @@ export default function SellVehicle() {
   const [imagePreview, setImagePreview] = useState([]);
   const [videoPreview, setVideoPreview] = useState(null);
 
-  // Check authentication
+  // Check authentication and load existing vehicle if in edit mode
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
@@ -90,8 +93,55 @@ export default function SellVehicle() {
       return;
     }
     setIsAuthenticated(true);
-    setAuthenticating(false);
-  }, [navigate]);
+
+    // Load existing vehicle if in edit mode
+    if (isEditMode) {
+      loadVehicle();
+    } else {
+      setAuthenticating(false);
+    }
+  }, [isEditMode, vehicleId]);
+
+  const loadVehicle = async () => {
+    try {
+      const response = await apiClient.get(`/vehicles/${vehicleId}`);
+      const vehicle = response.data;
+      setExistingVehicle(vehicle);
+      
+      // Pre-fill form with existing data
+      setForm({
+        vehicleType: vehicle.vehicleType,
+        make: vehicle.make,
+        modelName: vehicle.modelName,
+        year: vehicle.year,
+        price: String(vehicle.price),
+        mileage: String(vehicle.mileage),
+        fuelType: vehicle.fuelType,
+        condition: vehicle.condition,
+        description: vehicle.description,
+        location: vehicle.location,
+        phone: vehicle.phone,
+        images: [],
+        video: null,
+      });
+
+      // Load image previews from existing images
+      if (vehicle.images && vehicle.images.length > 0) {
+        const previews = vehicle.images.map(img => `${import.meta.env.VITE_API_URL}/uploads/${img}`);
+        setImagePreview(previews);
+      }
+
+      // Load video preview from existing video
+      if (vehicle.video) {
+        setVideoPreview(`${import.meta.env.VITE_API_URL}/uploads/${vehicle.video}`);
+      }
+
+      setAuthenticating(false);
+    } catch (err) {
+      setError("Failed to load vehicle details");
+      setAuthenticating(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -153,6 +203,24 @@ export default function SellVehicle() {
     setVideoPreview(null);
   };
 
+  const hasChanges = () => {
+    if (!existingVehicle) return true; // New listing, always has changes
+    
+    return (
+      form.make !== existingVehicle.make ||
+      form.modelName !== existingVehicle.modelName ||
+      String(form.year) !== String(existingVehicle.year) ||
+      String(form.price) !== String(existingVehicle.price) ||
+      String(form.mileage) !== String(existingVehicle.mileage) ||
+      form.fuelType !== existingVehicle.fuelType ||
+      form.condition !== existingVehicle.condition ||
+      form.description !== existingVehicle.description ||
+      form.location !== existingVehicle.location ||
+      form.phone !== existingVehicle.phone ||
+      form.images.length > 0 // New images uploaded
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
@@ -169,8 +237,14 @@ export default function SellVehicle() {
       return;
     }
 
-    if (form.images.length === 0) {
+    if (isEditMode && form.images.length === 0 && imagePreview.length === 0) {
       setError("Please upload at least one image");
+      return;
+    }
+
+    // For edits, check if there are any changes
+    if (isEditMode && !hasChanges()) {
+      setError("Please make at least one change to submit");
       return;
     }
 
@@ -195,26 +269,45 @@ export default function SellVehicle() {
       formData.append("location", form.location);
       formData.append("phone", form.phone);
 
+      // Only add new images (File objects, not existing URLs)
       form.images.forEach((image) => {
-        formData.append("images", image);
+        if (image instanceof File) {
+          formData.append("images", image);
+        }
       });
 
-      if (form.video) {
+      // Only add new video if it's a File object
+      if (form.video && form.video instanceof File) {
         formData.append("video", form.video);
       }
 
-      const { data } = await apiClient.post("/vehicles/sell", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const listingId = data?._id || data?.id;
+      let response;
+      if (isEditMode) {
+        // Create update request for editing
+        response = await apiClient.post(`/vehicles/${vehicleId}/update-request`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      } else {
+        // Create new vehicle listing
+        response = await apiClient.post("/vehicles/sell", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
+
+      const listingId = response.data?._id || response.data?.id || response.data?.vehicleId;
       setNewListingId(listingId);
       setStep("success");
-      setShowPaymentModal(true);
+      
+      if (!isEditMode) {
+        setShowPaymentModal(true);
+      }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to post vehicle listing"
+        err.response?.data?.message || (isEditMode ? "Failed to submit update request" : "Failed to post vehicle listing")
       );
       setStep("form");
     } finally {
@@ -277,10 +370,12 @@ export default function SellVehicle() {
               <Car className="text-white" size={20} />
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-1.5">
-              Sell Your Vehicle
+              {isEditMode ? "Edit Your Listing" : "Sell Your Vehicle"}
             </h2>
             <p className="text-sm sm:text-base text-slate-500 px-2">
-              Fill in the details and upload images of your vehicle
+              {isEditMode 
+                ? "Update your listing details. Changes will be reviewed by an admin."
+                : "Fill in the details and upload images of your vehicle"}
             </p>
           </div>
 
@@ -602,17 +697,19 @@ export default function SellVehicle() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-white font-semibold shadow-lg hover:shadow-xl transition duration-200 ${
-              loading
-                ? "bg-slate-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700"
-            }`}
-          >
-            Review & Post
-          </button>
+          {(!isEditMode || hasChanges()) && (
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-white font-semibold shadow-lg hover:shadow-xl transition duration-200 ${
+                loading
+                  ? "bg-slate-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700"
+              }`}
+            >
+              {isEditMode ? "Review Changes" : "Review & Post"}
+            </button>
+          )}
         </form>
       </div>
     );
@@ -624,10 +721,12 @@ export default function SellVehicle() {
         <div className="w-full max-w-3xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 border border-sky-100">
           <div className="mb-6 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-              Review Your Listing
+              {isEditMode ? "Review Changes" : "Review Your Listing"}
             </h2>
             <p className="text-sm sm:text-base text-slate-500">
-              Make sure everything looks correct before posting
+              {isEditMode 
+                ? "Make sure your changes are correct before submitting for review"
+                : "Make sure everything looks correct before posting"}
             </p>
           </div>
 
@@ -710,7 +809,9 @@ export default function SellVehicle() {
                   : "bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700"
               }`}
             >
-              {loading ? "Posting..." : "Confirm & Post"}
+              {isEditMode 
+                ? (loading ? "Submitting..." : "Submit Changes")
+                : (loading ? "Posting..." : "Confirm & Post")}
             </button>
           </div>
         </div>
@@ -727,10 +828,12 @@ export default function SellVehicle() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1.5">
-            Listing Posted!
+            {isEditMode ? "Update Requested!" : "Listing Posted!"}
           </h2>
           <p className="text-sm sm:text-base text-slate-500 mb-5 sm:mb-6 px-2">
-            Your vehicle listing has been successfully posted.
+            {isEditMode 
+              ? "Your changes have been submitted. An admin will review and approve them soon."
+              : "Your vehicle listing has been successfully posted."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -740,7 +843,7 @@ export default function SellVehicle() {
             >
               Go to Dashboard
             </button>
-            {newListingId && (
+            {!isEditMode && newListingId && (
               <button
                 onClick={() => navigate(`/payment/${newListingId}`)}
                 className="flex-1 rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-white font-semibold shadow-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-600 transition"
@@ -750,7 +853,7 @@ export default function SellVehicle() {
             )}
           </div>
         </div>
-        {showPaymentModal && (
+        {!isEditMode && showPaymentModal && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-6">
               <h3 className="text-xl font-bold text-slate-900 mb-2">Complete Payment</h3>
@@ -779,5 +882,4 @@ export default function SellVehicle() {
         )}
       </div>
     );
-  }
-}
+  }}

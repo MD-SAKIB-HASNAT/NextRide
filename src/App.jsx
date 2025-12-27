@@ -17,12 +17,15 @@ import AdminCarPosts from "./Admin/Pages/AdminCarPosts";
 import SellVehicle from "./Feature/Page/SellVehicle/SellVehicle";
 import MyListings from "./Feature/Page/Dashboard/MyListings";
 import PendingPayments from "./Feature/Page/Dashboard/PendingPayments";
+import PendingUpdates from "./Feature/Page/Dashboard/PendingUpdates";
+import Analytics from "./Feature/Page/Dashboard/Analytics";
 import EditProfile from "./Feature/Page/Dashboard/EditProfile";
 import BuyCars from "./Feature/Page/BuyCars/BuyCars";
 import BuyBikes from "./Feature/Page/BuyBikes/BuyBikes";
 import VehicleDetails from "./Feature/Page/VehicleDetails/VehicleDetails";
 import SellerProfile from "./Feature/Page/SellerProfile/SellerProfile";
 import Payment from "./Feature/Page/Payment/Payment";
+
 
 export default function App() {
   return (
@@ -41,8 +44,11 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-listings" element={<MyListings />} />
           <Route path="/pending-payments" element={<PendingPayments />} />
+          <Route path="/pending-updates" element={<PendingUpdates />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/sell" element={<SellVehicle />} />
+          <Route path="/sell/:id" element={<SellVehicle />} />
           <Route path="/cars" element={<BuyCars />} />
           <Route path="/bikes" element={<BuyBikes />} />
           <Route path="/vehicles/:id" element={<VehicleDetails />} />

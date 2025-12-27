@@ -8,6 +8,7 @@ import {
   Phone,
   Shield,
   User,
+  Clock,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 
@@ -143,19 +144,24 @@ export default function Dashboard() {
                 className="text-left bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-3xl shadow-lg p-6 hover:-translate-y-0.5 transition transform"
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-blue-100">My posts</p>
+                  <p className="text-sm text-blue-100">Manage My posts</p>
                   <Activity size={22} />
                 </div>
                 <h3 className="text-3xl font-bold mt-2">{stats.totalCount}</h3>
                 <p className="text-xs text-blue-200 mt-1">{stats.bikeCount} bikes • {stats.carCount} cars</p>
               </button>
-              <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100">
+              <button
+                type="button"
+                onClick={() => navigate("/analytics")}
+                className="text-left bg-white rounded-3xl shadow-lg p-6 border border-slate-100 hover:-translate-y-0.5 transition transform cursor-pointer"
+              >
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-500">Total Listings</p>
+                  <p className="text-sm text-slate-500">Analytics</p>
                   <Activity size={22} className="text-sky-500" />
                 </div>
-                <h3 className="text-3xl font-bold text-slate-900 mt-2">{stats.totalCount}</h3>
-              </div>
+                <h3 className="text-xl font-bold text-slate-900 mt-2">View Stats</h3>
+                <p className="text-xs text-slate-400 mt-1">See detailed analytics</p>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -169,6 +175,18 @@ export default function Dashboard() {
                   <CreditCard size={22} className="text-amber-600" />
                 </div>
                 <h3 className="text-3xl font-bold text-slate-900 mt-2">{stats.pendingCount}</h3>
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/pending-updates")}
+                className="text-left bg-white rounded-3xl shadow-lg p-6 border border-slate-100 hover:-translate-y-0.5 transition transform cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500">Pending Updates</p>
+                  <Clock size={22} className="text-sky-500" />
+                </div>
+                <h3 className="text-3xl font-bold text-slate-900 mt-2">View</h3>
+                <p className="text-xs text-slate-400 mt-1">Check update requests</p>
               </button>
             </div>
           </main>

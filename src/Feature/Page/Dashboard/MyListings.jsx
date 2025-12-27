@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Bike, Car, CheckCircle, Filter, MapPin, Tag, X } from "lucide-react";
+import { Bike, Car, CheckCircle, Filter, MapPin, Tag, X, Pencil, Trash2 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 import LoadingSpinner from "../../../LoadingSpinner/LoadingSpinner";
 
@@ -186,6 +186,30 @@ export default function MyListings() {
                   <CheckCircle size={14} /> {item.paymentStatus === "paid" ? "Payment received" : "Payment pending"}
                 </span>
                 <span className="text-slate-500">Posted {formatDate(item.createdAt)}</span>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  onClick={() => navigate(`/sell/${item._id}`)}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 text-xs font-semibold hover:bg-sky-100"
+                >
+                  <Pencil size={14} /> Edit
+                </button>
+                <button
+                  onClick={async () => {
+                    const ok = window.confirm('Delete this listing? This cannot be undone.');
+                    if (!ok) return;
+                    try {
+                      await apiClient.delete(`/vehicles/${item._id}`);
+                      setListings(prev => prev.filter(v => v._id !== item._id));
+                    } catch (err) {
+                      alert(err.response?.data?.message || 'Failed to delete');
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 text-xs font-semibold hover:bg-red-100"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
               </div>
             </div>
           ))}

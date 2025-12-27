@@ -8,6 +8,7 @@ import {
   Tag,
   ChevronRight,
   Filter,
+  Search,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 import LoadingSpinner from "../../../Components/LoadingSpiner";
@@ -24,6 +25,7 @@ export default function PendingPayments() {
     vehicleType: "",
     fromDate: "",
     toDate: "",
+    search: "",
   });
 
   const fetchPendingPayments = async (newFilters = null, isLoadMore = false) => {
@@ -38,6 +40,7 @@ export default function PendingPayments() {
       });
 
       if (filtersToUse.vehicleType) params.append('vehicleType', filtersToUse.vehicleType);
+      if (filtersToUse.search) params.append('search', filtersToUse.search);
       if (filtersToUse.fromDate) params.append('fromDate', filtersToUse.fromDate);
       if (filtersToUse.toDate) params.append('toDate', filtersToUse.toDate);
       if (isLoadMore && nextCursor) params.append('cursor', nextCursor);
@@ -80,8 +83,10 @@ export default function PendingPayments() {
     fetchPendingPayments(filters);
   };
 
+  console.log(pendingListings[0]?.images[0]);
+
   const clearFilters = () => {
-    const emptyFilters = { vehicleType: "", fromDate: "", toDate: "" };
+    const emptyFilters = { vehicleType: "", fromDate: "", toDate: "", search: "" };
     setFilters(emptyFilters);
     setPendingListings([]);
     setNextCursor(null);
@@ -146,6 +151,21 @@ export default function PendingPayments() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search */}
+            <div className="md:col-span-3">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                <Search size={16} className="inline mr-2" />
+                Search by brand or model
+              </label>
+              <input
+                type="text"
+                name="search"
+                value={filters.search}
+                onChange={handleFilterChange}
+                placeholder="e.g., Toyota Corolla"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
             {/* Vehicle Type */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -243,7 +263,7 @@ export default function PendingPayments() {
                       {listing.images && listing.images.length > 0 && (
                         <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-slate-100">
                           <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${listing.images[0]}`}
+                            src={`${import.meta.env.VITE_API_URL}/uploads/${listing.images[0]}`}
                             alt={listing.modelName}
                             className="w-full h-full object-cover"
                           />
@@ -261,18 +281,21 @@ export default function PendingPayments() {
                               {listing.vehicleType} • {listing.fuelType} • {listing.year}
                             </p>
                           </div>
-                          <span className="px-3 py-1 text-xs rounded-full bg-amber-100 text-amber-700 font-semibold border border-amber-200">
-                            Pending Payment
-                          </span>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mt-3">
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mt-3">
                           <div className="flex items-center gap-1">
                             <Tag size={16} className="text-sky-500" />
                             <span className="font-semibold text-slate-900">
                               ৳ {listing.price.toLocaleString()}
                             </span>
                           </div>
+                            <div className="flex items-center gap-1">
+                              <CreditCard size={16} className="text-amber-500" />
+                              <span className="font-semibold text-amber-700">
+                                Platform Fee: ৳ {(listing.platformFee || 0).toLocaleString()}
+                              </span>
+                            </div>
                           <div className="flex items-center gap-1">
                             <MapPin size={16} className="text-slate-400" />
                             <span>{listing.location}</span>
@@ -293,10 +316,16 @@ export default function PendingPayments() {
                   </div>
 
                   {/* Action Button */}
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 flex gap-3">
+                    <button
+                      onClick={() => navigate(`/vehicles/${listing._id}`)}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-100 text-slate-800 font-semibold hover:bg-slate-200 border border-slate-200 transition"
+                    >
+                      View Details
+                    </button>
                     <button
                       onClick={() => handlePayNow(listing._id)}
-                      className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-lg transition"
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-lg transition"
                     >
                       <CreditCard size={18} />
                       Pay Now
