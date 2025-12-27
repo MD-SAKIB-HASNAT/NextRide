@@ -86,7 +86,10 @@ export default function SellVehicle() {
 
   // Check authentication and load existing vehicle if in edit mode
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if(storedUser?.role === 'admin'){
+      navigate("/admin");
+    }
     if (!storedUser) {
       setIsAuthenticated(false);
       setAuthenticating(false);
@@ -204,7 +207,7 @@ export default function SellVehicle() {
   };
 
   const hasChanges = () => {
-    if (!existingVehicle) return true; // New listing, always has changes
+    if (!existingVehicle) return true; 
     
     return (
       form.make !== existingVehicle.make ||

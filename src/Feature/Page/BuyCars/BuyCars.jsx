@@ -62,7 +62,7 @@ export default function Cars() {
       params.append("limit", "12");
       if (isLoadMore && nextCursor) params.append("cursor", nextCursor);
 
-      const endpoint = `/vehicles/filtered-listings?${params.toString()}`;
+      const endpoint = `/vehicles/public/filtered-listings?${params.toString()}`;
 
       const { data } = await apiClient.get(endpoint);
 

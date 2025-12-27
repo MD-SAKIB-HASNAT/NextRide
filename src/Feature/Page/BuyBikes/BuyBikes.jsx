@@ -62,7 +62,7 @@ export default function BuyBikes() {
       params.append("limit", "12");
       if (isLoadMore && nextCursor) params.append("cursor", nextCursor);
 
-      const endpoint = `/vehicles/filtered-listings?${params.toString()}`;
+      const endpoint = `/vehicles/public/filtered-listings?${params.toString()}`;
 
       const { data } = await apiClient.get(endpoint);
 
@@ -273,7 +273,7 @@ export default function BuyBikes() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5">
                   {bikes.map((bike) => (
                     <VehicleCard key={bike._id} vehicle={bike} />
                   ))}

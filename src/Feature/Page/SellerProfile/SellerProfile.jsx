@@ -10,6 +10,7 @@ import {
   CheckCircle,
   XCircle,
   User as UserIcon,
+  MessageCircle,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 import LoadingSpinner from "../../../LoadingSpinner/LoadingSpinner";
@@ -84,7 +85,6 @@ export default function SellerProfile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-600 hover:text-sky-600 mb-6 transition"
@@ -95,22 +95,27 @@ export default function SellerProfile() {
 
         {/* Seller Profile Card */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-          {/* Header Background */}
-          <div className="h-32 bg-gradient-to-r from-sky-500 to-blue-600"></div>
-
-          {/* Profile Content */}
+          <div className="h-32 bg-gradient-to-r from-green-100 to-blue-200"></div>
           <div className="px-6 pb-6">
             <div className="flex flex-col md:flex-row gap-6 -mt-16">
               {/* Avatar */}
               <div className="flex-shrink-0">
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-5xl font-bold shadow-xl border-4 border-white">
-                  {seller.name?.charAt(0).toUpperCase()}
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-5xl font-bold shadow-xl border-4 border-white overflow-hidden">
+                  {seller.profilePhoto ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_URL}/${seller.profilePhoto}`}
+                      alt={seller.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    seller.name?.charAt(0).toUpperCase()
+                  )}
                 </div>
               </div>
 
               {/* Info */}
               <div className="flex-grow mt-4 md:mt-12">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-4">
                   <div>
                     <h1 className="text-3xl font-bold text-slate-900 mb-1">{seller.name}</h1>
                     <div className="flex items-center gap-2 text-slate-600">
@@ -130,6 +135,11 @@ export default function SellerProfile() {
                       )}
                     </div>
                   </div>
+                  {/* Message Button */}
+                  <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition transform">
+                    <MessageCircle size={20} />
+                    Send Message
+                  </button>
                 </div>
 
                 {/* Contact Info Grid */}

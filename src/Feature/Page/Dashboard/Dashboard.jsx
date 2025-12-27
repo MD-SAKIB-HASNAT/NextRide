@@ -34,6 +34,10 @@ export default function Dashboard() {
       navigate("/login");
       return;
     }
+    if(userData.role === 'admin'){
+      navigate("/admin");
+      return;
+    }
 
     setUser(userData);
     

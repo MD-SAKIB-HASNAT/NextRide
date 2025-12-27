@@ -1,40 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import apiClient from '../../api/axiosInstance';
-import { Trash2, Eye, CheckCircle, XCircle, ChevronLeft, ChevronRight, Bike } from 'lucide-react';
+import { Trash2, Eye, CheckCircle, XCircle, Bike } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminBikePosts() {
   const [loading, setLoading] = useState(true);
   const [bikes, setBikes] = useState([]);
   const [error, setError] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
   const [filters, setFilters] = useState({
     paymentStatus: 'all', // all, pending, paid
-    vehicleStatus: 'all', // all, active, pending, rejected, sold
+    postStatus: 'all', // all, active, pending, rejected, sold
   });
+  const navigate = useNavigate();
 
-  const fetchBikes = async () => {
+  const fetchBikes = async (cursor) => {
     try {
-      setLoading(true);
+      setLoading(!cursor);
       setError('');
       
       const params = new URLSearchParams();
-      params.append('cursor', currentPage === 1 ? '' : currentPage.toString());
       params.append('limit', '10');
       params.append('vehicleType', 'bike');
+      if (cursor) params.append('cursor', cursor);
       
       if (filters.paymentStatus !== 'all') {
         params.append('paymentStatus', filters.paymentStatus);
       }
-      if (filters.vehicleStatus !== 'all') {
-        params.append('vehicleStatus', filters.vehicleStatus);
+      if (filters.postStatus !== 'all') {
+        params.append('status', filters.postStatus);
       }
       
       const { data } = await apiClient.get(`/vehicles/filtered-listings?${params}`);
-      
-      setBikes(data.items || []);
-      setTotalPages(data.hasMore ? currentPage + 1 : currentPage);
+      console.log(data);
+
+      const items = data?.data || [];
+      const pageInfo = data?.pageInfo || {};
+
+      if (cursor) {
+        setBikes(prev => [...prev, ...items]);
+      } else {
+        setBikes(items);
+      }
+
+      setNextCursor(pageInfo.nextCursor || null);
+      setHasMore(!!pageInfo.hasNextPage);
     } catch (err) {
       console.error('Failed to fetch bikes:', err);
       setError(err.response?.data?.message || 'Failed to load bike posts');
@@ -44,52 +56,56 @@ export default function AdminBikePosts() {
   };
 
   useEffect(() => {
+    setNextCursor(null);
     fetchBikes();
-  }, [currentPage, filters]);
+  }, [filters]);
 
-  const handleApprove = async (bikeId) => {
+  const loadMore = async () => {
+    if (!hasMore || loading) return;
+    await fetchBikes(nextCursor);
+  };
+
+  const updateStatus = async (bikeId, status, confirmMessage, successMessage) => {
+    if (!confirm(confirmMessage)) return;
     try {
-      // await apiClient.put(`/admin/vehicles/${bikeId}/approve`);
-      alert('Bike post approved successfully!');
+      await apiClient.patch(`/vehicles/status/${bikeId}`, { status });
+      alert(successMessage);
       fetchBikes();
     } catch (err) {
-      alert('Failed to approve bike post');
+      console.error('Failed to update bike status:', err);
+      alert(err.response?.data?.message || 'Failed to update bike status');
     }
   };
 
-  const handleReject = async (bikeId) => {
-    try {
-      // await apiClient.put(`/admin/vehicles/${bikeId}/reject`);
-      alert('Bike post rejected successfully!');
-      fetchBikes();
-    } catch (err) {
-      alert('Failed to reject bike post');
-    }
-  };
+  const handleApprove = (bikeId) => updateStatus(bikeId, 'active', 'Are you sure you want to approve this bike post?', 'Bike post approved successfully!');
+  const handleReject = (bikeId) => updateStatus(bikeId, 'rejected', 'Are you sure you want to reject this bike post?', 'Bike post rejected successfully!');
 
   const handleDelete = async (bikeId) => {
     if (!confirm('Are you sure you want to delete this bike post?')) return;
     try {
-      // await apiClient.delete(`/admin/vehicles/${bikeId}`);
+      await apiClient.delete(`/vehicles/${bikeId}`);
       alert('Bike post deleted successfully!');
       fetchBikes();
     } catch (err) {
-      alert('Failed to delete bike post');
+      console.error('Failed to delete bike:', err);
+      alert(err.response?.data?.message || 'Failed to delete bike post');
     }
   };
 
   const getPostStatusBadge = (status) => {
+    const s = String(status || '').toLowerCase();
     const statusStyles = {
       active: 'bg-green-100 text-green-700',
       pending: 'bg-amber-100 text-amber-700',
       rejected: 'bg-red-100 text-red-700',
       sold: 'bg-blue-100 text-blue-700',
     };
-    return statusStyles[status.toLowerCase()] || 'bg-slate-100 text-slate-700';
+    return statusStyles[s] || 'bg-slate-100 text-slate-700';
   };
 
   const getPaymentStatusBadge = (status) => {
-    return status === 'paid' 
+    const s = String(status || '').toLowerCase();
+    return s === 'paid' 
       ? 'bg-green-100 text-green-700' 
       : 'bg-amber-100 text-amber-700';
   };
@@ -152,8 +168,8 @@ export default function AdminBikePosts() {
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Bike Model</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Make</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Bike</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Type</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Price</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Mileage</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Seller</th>
@@ -172,19 +188,19 @@ export default function AdminBikePosts() {
               ) : (
                 bikes.map((bike) => (
                   <tr key={bike._id} className="border-b border-slate-200 hover:bg-slate-50 transition">
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">{bike.title}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{bike.make}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900">{[bike.make, bike.modelName].filter(Boolean).join(' ')}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600 capitalize">{bike.vehicleType}</td>
                     <td className="px-6 py-4 text-sm font-semibold text-slate-900">৳{bike.price.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{bike.mileage.toLocaleString()} km</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{bike.userId?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{(bike.mileage ?? 0).toLocaleString()} km</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{bike.userId?.name || '—'}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPostStatusBadge(bike.status)}`}>
-                        {bike.status}
+                        {String(bike.status || '').toLowerCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadge(bike.paymentStatus)}`}>
-                        {bike.paymentStatus}
+                        {String(bike.paymentStatus || '').toLowerCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
@@ -206,6 +222,7 @@ export default function AdminBikePosts() {
                         <button 
                           className="p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition"
                           title="View Details"
+                          onClick={() => navigate(`/vehicles/${bike._id}`)}
                         >
                           <Eye size={18} />
                         </button>
@@ -225,36 +242,20 @@ export default function AdminBikePosts() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Load More */}
         {bikes.length > 0 && (
-          <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-between">
-            <div className="text-sm text-slate-600">
-              Page {currentPage} of {totalPages}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`p-2 rounded-lg transition ${
-                  currentPage === 1
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`p-2 rounded-lg transition ${
-                  currentPage === totalPages
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
+          <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-center">
+            <button
+              onClick={loadMore}
+              disabled={!hasMore || loading}
+              className={`px-6 py-2 rounded-lg font-semibold transition ${
+                hasMore
+                  ? 'bg-sky-500 text-white hover:bg-sky-600'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              {hasMore ? 'Load More' : 'No More Results'}
+            </button>
           </div>
         )}
       </div>

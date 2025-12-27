@@ -2,27 +2,29 @@ import React, { useEffect, useState } from 'react';
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import apiClient from '../../api/axiosInstance';
 import { Trash2, Eye, CheckCircle, XCircle, ChevronLeft, ChevronRight, Car } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminCarPosts() {
   const [loading, setLoading] = useState(true);
   const [cars, setCars] = useState([]);
   const [error, setError] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
   const [filters, setFilters] = useState({
-    paymentStatus: 'all', // all, pending, paid
-    postStatus: 'all', // all, active, pending, rejected, sold
+    paymentStatus: 'all', 
+    postStatus: 'all', 
   });
+  const navigate = useNavigate();
 
-  const fetchCars = async () => {
+  const fetchCars = async (cursor) => {
     try {
-      setLoading(true);
+      setLoading(!cursor);
       setError('');
       
       const params = new URLSearchParams();
-      params.append('page', currentPage);
-      params.append('limit', 10);
+      params.append('limit', '10');
       params.append('vehicleType', 'car');
+      if (cursor) params.append('cursor', cursor);
       
       if (filters.paymentStatus !== 'all') {
         params.append('paymentStatus', filters.paymentStatus);
@@ -30,11 +32,19 @@ export default function AdminCarPosts() {
       if (filters.postStatus !== 'all') {
         params.append('status', filters.postStatus);
       }
-      
-      const { data } = await apiClient.get(`/vehicles/admin/all?${params}`);
-      
-      setCars(data.vehicles || []);
-      setTotalPages(data.totalPages || 1);
+      const { data } = await apiClient.get(`/vehicles/filtered-listings?${params}`);
+
+      const items = data?.data || [];
+      const pageInfo = data?.pageInfo || {};
+
+      if (cursor) {
+        setCars(prev => [...prev, ...items]);
+      } else {
+        setCars(items);
+      }
+
+      setNextCursor(pageInfo.nextCursor || null);
+      setHasMore(!!pageInfo.hasNextPage);
     } catch (err) {
       console.error('Failed to fetch cars:', err);
       setError(err.response?.data?.message || 'Failed to load car posts');
@@ -44,30 +54,30 @@ export default function AdminCarPosts() {
   };
 
   useEffect(() => {
+    // Reset list when filters change
+    setNextCursor(null);
     fetchCars();
-  }, [currentPage, filters]);
+  }, [filters]);
 
-  const handleApprove = async (carId) => {
+  const loadMore = async () => {
+    if (!hasMore || loading) return;
+    await fetchCars(nextCursor);
+  };
+
+  const updateStatus = async (carId, status, confirmMessage, successMessage) => {
+    if (!confirm(confirmMessage)) return;
     try {
-      await apiClient.put(`/vehicles/${carId}/approve`);
-      alert('Car post approved successfully!');
+      await apiClient.patch(`/vehicles/status/${carId}`, { status });
+      alert(successMessage);
       fetchCars();
     } catch (err) {
-      console.error('Failed to approve car:', err);
-      alert(err.response?.data?.message || 'Failed to approve car post');
+      console.error('Failed to update car status:', err);
+      alert(err.response?.data?.message || 'Failed to update car status');
     }
   };
 
-  const handleReject = async (carId) => {
-    try {
-      await apiClient.put(`/vehicles/${carId}/reject`);
-      alert('Car post rejected successfully!');
-      fetchCars();
-    } catch (err) {
-      console.error('Failed to reject car:', err);
-      alert(err.response?.data?.message || 'Failed to reject car post');
-    }
-  };
+  const handleApprove = (carId) => updateStatus(carId, 'active', 'Are you sure you want to approve this car post?', 'Car post approved successfully!');
+  const handleReject = (carId) => updateStatus(carId, 'rejected', 'Are you sure you want to reject this car post?', 'Car post rejected successfully!');
 
   const handleDelete = async (carId) => {
     if (!confirm('Are you sure you want to delete this car post?')) return;
@@ -82,17 +92,19 @@ export default function AdminCarPosts() {
   };
 
   const getPostStatusBadge = (status) => {
+    const s = String(status || '').toLowerCase();
     const statusStyles = {
       active: 'bg-green-100 text-green-700',
       pending: 'bg-amber-100 text-amber-700',
       rejected: 'bg-red-100 text-red-700',
       sold: 'bg-blue-100 text-blue-700',
     };
-    return statusStyles[status.toLowerCase()] || 'bg-slate-100 text-slate-700';
+    return statusStyles[s] || 'bg-slate-100 text-slate-700';
   };
 
   const getPaymentStatusBadge = (status) => {
-    return status === 'paid' 
+    const s = String(status || '').toLowerCase();
+    return s === 'paid' 
       ? 'bg-green-100 text-green-700' 
       : 'bg-amber-100 text-amber-700';
   };
@@ -155,8 +167,8 @@ export default function AdminCarPosts() {
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Car Model</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Make</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Car</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Type</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Price</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Mileage</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Seller</th>
@@ -175,19 +187,19 @@ export default function AdminCarPosts() {
               ) : (
                 cars.map((car) => (
                   <tr key={car._id} className="border-b border-slate-200 hover:bg-slate-50 transition">
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">{car.title}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{car.make}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900">{[car.make, car.modelName].filter(Boolean).join(' ')}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600 capitalize">{car.vehicleType}</td>
                     <td className="px-6 py-4 text-sm font-semibold text-slate-900">৳{car.price.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{car.mileage.toLocaleString()} km</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{car.seller}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{(car.mileage ?? 0).toLocaleString()} km</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{car.userId?.name || '—'}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPostStatusBadge(car.postStatus)}`}>
-                        {car.postStatus}
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPostStatusBadge(car.status)}`}>
+                        {String(car.status || '').toLowerCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadge(car.paymentStatus)}`}>
-                        {car.paymentStatus}
+                        {String(car.paymentStatus || '').toLowerCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
@@ -207,6 +219,7 @@ export default function AdminCarPosts() {
                           <XCircle size={18} />
                         </button>
                         <button 
+                          onClick={() => navigate(`/vehicles/${car._id}`)}
                           className="p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition"
                           title="View Details"
                         >
@@ -228,36 +241,20 @@ export default function AdminCarPosts() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Load More */}
         {cars.length > 0 && (
-          <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-between">
-            <div className="text-sm text-slate-600">
-              Page {currentPage} of {totalPages}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`p-2 rounded-lg transition ${
-                  currentPage === 1
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`p-2 rounded-lg transition ${
-                  currentPage === totalPages
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
+          <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-center">
+            <button
+              onClick={loadMore}
+              disabled={!hasMore || loading}
+              className={`px-6 py-2 rounded-lg font-semibold transition ${
+                hasMore
+                  ? 'bg-sky-500 text-white hover:bg-sky-600'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              {hasMore ? 'Load More' : 'No More Results'}
+            </button>
           </div>
         )}
       </div>

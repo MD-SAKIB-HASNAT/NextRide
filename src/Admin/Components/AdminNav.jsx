@@ -33,7 +33,7 @@ export default function AdminNav({ sidebarOpen }) {
       {navItem(<Bike size={20} />, 'Bike Posts', '/admin/bike-posts')}
       {navItem(<Car size={20} />, 'Car Posts', '/admin/car-posts')}
       {navItem(<Users size={20} />, 'Users', '/admin/users')}
-      {navItem(<Truck size={20} />, 'Vehicles', '/admin/vehicles')}
+      {navItem(<Truck size={20} />, 'Vehicles Update Requests', '/admin/vehicles/updates/requests')}
       {navItem(<TrendingUp size={20} />, 'Analytics', '/admin/analytics')}
       {navItem(<Settings size={20} />, 'Settings', '/admin/settings')}
     </nav>

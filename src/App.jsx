@@ -22,9 +22,9 @@ import Analytics from "./Feature/Page/Dashboard/Analytics";
 import EditProfile from "./Feature/Page/Dashboard/EditProfile";
 import BuyCars from "./Feature/Page/BuyCars/BuyCars";
 import BuyBikes from "./Feature/Page/BuyBikes/BuyBikes";
-import VehicleDetails from "./Feature/Page/VehicleDetails/VehicleDetails";
 import SellerProfile from "./Feature/Page/SellerProfile/SellerProfile";
 import Payment from "./Feature/Page/Payment/Payment";
+import VehicleDetails from "./Public/Pages/VehicleDetails/VehicleDetails";
 
 
 export default function App() {

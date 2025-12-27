@@ -14,9 +14,9 @@ export default function VehicleCard({ vehicle }) {
   const Icon = isCar ? Car : Bike;
 
   return (
-    <div className="rounded-lg w-60 border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-all">
+    <div className="rounded-lg w-full h-full border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-all flex flex-col">
       {/* Image */}
-      <div className="relative h-30 bg-linear-to-br from-slate-100 to-slate-200">
+      <div className="relative h-48 bg-linear-to-br from-slate-100 to-slate-200">
         {vehicle.images && vehicle.images[0] ? (
           <img
             src={`${import.meta.env.VITE_API_URL}/uploads/${vehicle.images[0]}`}
@@ -37,7 +37,7 @@ export default function VehicleCard({ vehicle }) {
       </div>
 
       {/* Content */}
-      <div className="p-3">
+      <div className="p-3 flex-1 flex flex-col">
         <h3 className="text-sm font-bold text-slate-900 mb-1">
           {vehicle.make} {vehicle.modelName}
         </h3>
@@ -94,7 +94,7 @@ export default function VehicleCard({ vehicle }) {
         {/* Action Button */}
         <button
           onClick={() => navigate(`/vehicles/${vehicle._id}`)}
-          className="w-full px-3 py-1.5 rounded-lg bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition"
+          className="w-full px-3 py-2 rounded-lg bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition"
         >
           View Details
         </button>
