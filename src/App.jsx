@@ -14,6 +14,7 @@ import AdminUsers from "./Admin/Pages/AdminUsers";
 import AdminAnalytics from "./Admin/Pages/AdminAnalytics";
 import AdminBikePosts from "./Admin/Pages/AdminBikePosts";
 import AdminCarPosts from "./Admin/Pages/AdminCarPosts";
+import AdminOrganizations from "./Admin/Pages/AdminOrganizations";
 import SellVehicle from "./Feature/Page/SellVehicle/SellVehicle";
 import MyListings from "./Feature/Page/Dashboard/MyListings";
 import PendingPayments from "./Feature/Page/Dashboard/PendingPayments";
@@ -27,6 +28,7 @@ import Payment from "./Feature/Page/Payment/Payment";
 import VehicleDetails from "./Public/Pages/VehicleDetails/VehicleDetails";
 import AdminVehicleUpdateRequests from "./Admin/Pages/AdminVehicleUpdateRequests";
 import Subscription from "./Feature/Page/Subscription/Subscription";
+import About from "./Feature/Page/About/About";
 
 
 export default function App() {
@@ -37,6 +39,7 @@ export default function App() {
           <Route index element={<AdminOverview />} />
           <Route path="bike-posts" element={<AdminBikePosts />} />
           <Route path="car-posts" element={<AdminCarPosts />} />
+          <Route path="organizations" element={<AdminOrganizations />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="settings" element={<AdminSettings />} />
@@ -55,6 +58,7 @@ export default function App() {
           <Route path="/cars" element={<BuyCars />} />
           <Route path="/bikes" element={<BuyBikes />} />
           <Route path="/subscriptions" element={<Subscription />} />
+          <Route path="/about" element={<About />} />
           <Route path="/vehicles/:id" element={<VehicleDetails />} />
           <Route path="/seller/:sellerId" element={<SellerProfile />} />
           <Route path="/payment/:id" element={<Payment />} />

@@ -9,6 +9,7 @@ import {
   Upload,
   FileText,
   CheckCircle,
+  Building2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +36,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [registrationData, setRegistrationData] = useState(null);
+  const [showOrgPending, setShowOrgPending] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -97,6 +99,9 @@ export default function Register() {
       setSuccess(`OTP sent to ${form.email}. Please check your email.`);
       setStep("otp");
       setOtp("");
+      if (form.role === "organization") {
+        setShowOrgPending(true);
+      }
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -154,6 +159,9 @@ export default function Register() {
       });
 
       setSuccess("OTP resent successfully. Check your email.");
+      if (registrationData?.role === "organization") {
+        setShowOrgPending(true);
+      }
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Failed to resend OTP"
@@ -513,6 +521,22 @@ export default function Register() {
           </motion.div>
         )}
 
+        {showOrgPending && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-3 sm:mb-4 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm"
+          >
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 text-amber-600"><Building2 size={18} /></div>
+              <div className="text-left">
+                <p className="font-semibold">Pending admin approval</p>
+                <p className="text-amber-700 text-xs sm:text-sm">We received your organization details. After admin approval, you will get a confirmation email and can access your account.</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* OTP Input */}
         <div className="mb-4 sm:mb-5">
           <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
@@ -597,8 +621,9 @@ export default function Register() {
           Email Verified!
         </h2>
         <p className="text-sm sm:text-base text-slate-500 mb-5 sm:mb-6 px-2">
-          Your account has been successfully created and verified. Redirecting
-          to login...
+          {registrationData?.role === "organization"
+            ? "Email verified. Your organization profile is pending admin approval. We will email you once it is approved."
+            : "Your account has been successfully created and verified. Redirecting to login..."}
         </p>
 
         <motion.div

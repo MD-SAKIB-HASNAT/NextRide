@@ -60,17 +60,16 @@ export default function Header() {
                 <Search size={18} />
               </button>
             </form>
-
-            <button
-              type="button"
-              onClick={() => navigate("/subscriptions")}
-              className="ml-4 hidden md:inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition"
-            >
-              Subscription
-            </button>
           </div>
 
           <div className="flex items-center justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => navigate("/subscriptions")}
+              className="hidden md:inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition"
+            >
+              Subscription
+            </button>
             <div className="hidden md:flex items-center gap-2">
               <div className="h-9 w-9 rounded-full border border-slate-200 flex items-center justify-center">
                 <Phone size={16} className="text-sky-500" />

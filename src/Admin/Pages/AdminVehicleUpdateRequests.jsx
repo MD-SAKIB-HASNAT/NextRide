@@ -17,10 +17,12 @@ export default function AdminVehicleUpdateRequests() {
   const [requests, setRequests] = useState([]);
   const [pageInfo, setPageInfo] = useState({ hasNextPage: false, nextCursor: undefined });
   const [error, setError] = useState("");
+  const [filters, setFilters] = useState({ status: "", vehicleType: "" });
 
   useEffect(() => {
     fetchRequests();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const fetchRequests = async (cursor) => {
     try {
@@ -33,8 +35,9 @@ export default function AdminVehicleUpdateRequests() {
 
       const { data } = await apiClient.get("/vehicles/updates-requests/list", {
         params: {
-          limit: 20,
           cursor,
+          status: filters.status || undefined,
+          vehicleType: filters.vehicleType || undefined,
         },
       });
 
@@ -79,6 +82,12 @@ export default function AdminVehicleUpdateRequests() {
     }
   };
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setPageInfo({ hasNextPage: false, nextCursor: undefined });
+  };
+
   const handleView = (vehicleId) => {
     if (!vehicleId) return;
     window.open(`/vehicles/${vehicleId}`, "_blank", "noopener,noreferrer");
@@ -99,9 +108,44 @@ export default function AdminVehicleUpdateRequests() {
 
   return (
     <div className="flex-1 overflow-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Vehicle Update Requests</h1>
-        <p className="text-slate-500 mt-2">Review, approve, or reject seller-submitted vehicle changes.</p>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Vehicle Update Requests</h1>
+          <p className="text-slate-500 mt-2">Review, approve, or reject seller-submitted vehicle changes.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 items-center">
+          <select
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+            className="px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+          >
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="in-review">In review</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+
+          <select
+            name="vehicleType"
+            value={filters.vehicleType}
+            onChange={handleFilterChange}
+            className="px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+          >
+            <option value="">All vehicle types</option>
+            <option value="car">Car</option>
+            <option value="bike">Bike</option>
+          </select>
+
+          <button
+            className="px-3 py-2 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200"
+            onClick={() => fetchRequests()}
+            disabled={loading}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {error && (
