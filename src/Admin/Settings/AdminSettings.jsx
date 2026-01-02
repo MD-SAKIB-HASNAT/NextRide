@@ -13,7 +13,7 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState({
     siteName: '',
     allowRegistration: true,
-    commissionRate: 0.05,
+    platformFeeRate: 0.05,
     maxListingsPerUser: 10,
     contactEmail: '',
     maintenanceMode: false,
@@ -38,7 +38,11 @@ export default function AdminSettings() {
     try {
       setLoading(true);
       const { data } = await apiClient.get('/admin/settings');
-      setSettings(data);
+      setSettings((prev) => ({
+        ...prev,
+        ...data,
+        platformFeeRate: data.platformFeeRate ?? data.commissionRate ?? prev.platformFeeRate,
+      }));
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to load settings');
     } finally {
@@ -59,7 +63,7 @@ export default function AdminSettings() {
     setError('');
     setSaving(true);
     try {
-      await apiClient.put('/admin/settings', settings);
+      await apiClient.patch('/admin/settings', settings);
 
       await new Promise(resolve => setTimeout(resolve, 2000));
       setSaving(false);
@@ -136,14 +140,14 @@ export default function AdminSettings() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Commission Rate (%)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Platform Fee Rate (%)</label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
-                name="commissionRate"
-                value={settings.commissionRate}
-                onChange={(e) => setSettings((p) => ({ ...p, commissionRate: parseFloat(e.target.value) }))}
+                name="platformFeeRate"
+                value={settings.platformFeeRate}
+                onChange={(e) => setSettings((p) => ({ ...p, platformFeeRate: parseFloat(e.target.value) }))}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
               />
             </div>

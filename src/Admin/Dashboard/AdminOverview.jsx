@@ -1,35 +1,33 @@
 import React, { useEffect, useState } from 'react';
+import { BarChart3, RefreshCcw, ShieldCheck, Truck, Users } from 'lucide-react';
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
-import { Users, Truck, BarChart3, TrendingUp } from 'lucide-react';
 import apiClient from '../../api/axiosInstance';
 
 export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalVehicles: 0,
-    activeListings: 0,
-    totalRevenue: 0,
-  });
+  const [error, setError] = useState('');
+  const [overview, setOverview] = useState(null);
+  const [settings, setSettings] = useState(null);
 
   useEffect(() => {
-    const fetchAdminStats = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        // TODO: replace with real endpoints
-        setStats({
-          totalUsers: 2450,
-          totalVehicles: 1280,
-          activeListings: 856,
-          totalRevenue: 125400,
-        });
-      } catch (error) {
-        console.error('Failed to fetch admin stats:', error);
+        setError('');
+        const [overviewRes, settingsRes] = await Promise.all([
+          apiClient.get('/admin/dashboard/overview'),
+          apiClient.get('/admin/settings'),
+        ]);
+        setOverview(overviewRes.data);
+        setSettings(settingsRes.data);
+      } catch (err) {
+        setError(err?.response?.data?.message || 'Failed to load admin overview');
       } finally {
         setLoading(false);
       }
     };
-    fetchAdminStats();
+
+    fetchData();
   }, []);
 
   if (loading) {
@@ -38,102 +36,56 @@ export default function AdminOverview() {
 
   return (
     <div className="flex-1 overflow-auto p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Total Users</p>
-              <p className="text-3xl font-bold text-slate-900 mt-2">{stats.totalUsers}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Users className="text-blue-600" size={24} />
-            </div>
-          </div>
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+          {error}
         </div>
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Total Vehicles</p>
-              <p className="text-3xl font-bold text-slate-900 mt-2">{stats.totalVehicles}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <Truck className="text-green-600" size={24} />
-            </div>
+      )}
+
+      {overview && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+            <StatCard title="Total Vehicles" value={overview.totalVehicles} tone="from-sky-500 to-blue-600" icon={<Truck size={20} />} />
+            <StatCard title="Active Listings" value={overview.activeCount} tone="from-emerald-500 to-teal-600" icon={<ShieldCheck size={20} />} />
+            <StatCard title="Pending Approvals" value={overview.pendingCount} tone="from-amber-500 to-orange-600" icon={<ShieldCheck size={20} />} />
+            <StatCard title="Update Requests" value={overview.pendingUpdateRequests} tone="from-indigo-500 to-purple-600" icon={<RefreshCcw size={20} />} />
           </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Active Listings</p>
-              <p className="text-3xl font-bold text-slate-900 mt-2">{stats.activeListings}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <BarChart3 className="text-yellow-600" size={24} />
-            </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <StatCard
+              title="Total Platform Fees"
+              value={`৳ ${overview.totalPlatformFee?.toLocaleString() || 0}`}
+              tone="from-slate-900 to-slate-700"
+              icon={<BarChart3 size={20} />}
+            />
+            <StatCard
+              title="Registered Users"
+              value={overview.totalUsers}
+              tone="from-cyan-500 to-blue-500"
+              icon={<Users size={20} />}
+            />
+            <StatCard
+              title="Platform Fee Rate"
+              value={`${((settings?.platformFeeRate ?? 0) * 100).toFixed(1)}%`}
+              tone="from-rose-500 to-red-600"
+              icon={<BarChart3 size={20} />}
+            />
           </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Total Revenue</p>
-              <p className="text-3xl font-bold text-slate-900 mt-2">${(stats.totalRevenue / 1000).toFixed(1)}K</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <TrendingUp className="text-purple-600" size={24} />
-            </div>
-          </div>
-        </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function StatCard({ title, value, icon, tone }) {
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center justify-between">
+      <div>
+        <p className="text-sm text-slate-500 font-medium">{title}</p>
+        <p className="text-2xl font-bold text-slate-900 mt-1">{value ?? 0}</p>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-              <div>
-                <p className="font-medium text-slate-900">New User Registration</p>
-                <p className="text-sm text-slate-500">5 minutes ago</p>
-              </div>
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">New</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-              <div>
-                <p className="font-medium text-slate-900">Vehicle Listed</p>
-                <p className="text-sm text-slate-500">15 minutes ago</p>
-              </div>
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Listed</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-              <div>
-                <p className="font-medium text-slate-900">Payment Received</p>
-                <p className="text-sm text-slate-500">1 hour ago</p>
-              </div>
-              <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">Paid</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Stats</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-600">Conversion Rate</span>
-              <span className="font-semibold text-slate-900">3.2%</span>
-            </div>
-            <div className="w-full bg-slate-200 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full" style={{ width: '32%' }}></div>
-            </div>
-            <div className="pt-4 border-t border-slate-200">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-slate-600">User Growth</span>
-                <span className="font-semibold text-slate-900">+12.5%</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '65%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className={`h-10 w-10 rounded-lg bg-gradient-to-br ${tone} text-white flex items-center justify-center`}>
+        {icon}
       </div>
     </div>
   );

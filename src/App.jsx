@@ -25,6 +25,8 @@ import BuyBikes from "./Feature/Page/BuyBikes/BuyBikes";
 import SellerProfile from "./Feature/Page/SellerProfile/SellerProfile";
 import Payment from "./Feature/Page/Payment/Payment";
 import VehicleDetails from "./Public/Pages/VehicleDetails/VehicleDetails";
+import AdminVehicleUpdateRequests from "./Admin/Pages/AdminVehicleUpdateRequests";
+import Subscription from "./Feature/Page/Subscription/Subscription";
 
 
 export default function App() {
@@ -38,6 +40,7 @@ export default function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="vehicle-update-requests" element={<AdminVehicleUpdateRequests />} />
         </Route>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
@@ -51,6 +54,7 @@ export default function App() {
           <Route path="/sell/:id" element={<SellVehicle />} />
           <Route path="/cars" element={<BuyCars />} />
           <Route path="/bikes" element={<BuyBikes />} />
+          <Route path="/subscriptions" element={<Subscription />} />
           <Route path="/vehicles/:id" element={<VehicleDetails />} />
           <Route path="/seller/:sellerId" element={<SellerProfile />} />
           <Route path="/payment/:id" element={<Payment />} />

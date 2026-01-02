@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { BarChart3, Users, Truck, TrendingUp, LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import AdminNav from '../Components/AdminNav';
@@ -18,12 +18,14 @@ export default function AdminDashboard() {
       // Check if user is admin
       if (userData.role !== 'admin') {
         navigate('/dashboard');
+        setLoading(false);
         return;
       }
       setUser(userData);
       setLoading(false);
     } else {
       navigate('/login');
+      setLoading(false);
     }
   }, [navigate]);
 
@@ -35,7 +37,7 @@ export default function AdminDashboard() {
     navigate('/login');
   };
 
-  if (!user) {
+  if (!user || loading) {
     return <LoadingSpinner />;
   }
 
@@ -64,7 +66,7 @@ export default function AdminDashboard() {
         <AdminNav sidebarOpen={sidebarOpen} />
 
         {/* Logout */}
-        <div className="p-4 border-t bg-red-500 border-slate-700">
+        <div className="p-4 border-t bg-blue-950 border-slate-700">
           <button
             onClick={handleLogout}
             className={`w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-600 transition ${

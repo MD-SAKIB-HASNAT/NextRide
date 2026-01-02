@@ -26,7 +26,7 @@ export default function Header() {
     { label: "Rent Vehicles", href: "/rent" },
     { label: "Organizations", href: "/organizations" },
     { label: "Accessories", href: "/accessories" },
-    { label: "Blog", href: "/blog" },
+    { label: "About Us", href: "/about" },
   ];
 
   return (
@@ -60,6 +60,14 @@ export default function Header() {
                 <Search size={18} />
               </button>
             </form>
+
+            <button
+              type="button"
+              onClick={() => navigate("/subscriptions")}
+              className="ml-4 hidden md:inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition"
+            >
+              Subscription
+            </button>
           </div>
 
           <div className="flex items-center justify-end gap-4">
@@ -159,6 +167,16 @@ export default function Header() {
             <div className="pt-4 border-t border-slate-200">
               <p className="text-xs text-slate-500">Support</p>
               <p className="font-medium text-slate-900">01992403647</p>
+
+              <button
+                onClick={() => {
+                  navigate("/subscriptions");
+                  setMobileOpen(false);
+                }}
+                className="mt-3 w-full text-center rounded-full bg-slate-900 px-4 py-2 text-white text-sm font-semibold"
+              >
+                Subscription
+              </button>
 
               {isLoggedIn ? (
                 <div className="mt-3 space-y-2">

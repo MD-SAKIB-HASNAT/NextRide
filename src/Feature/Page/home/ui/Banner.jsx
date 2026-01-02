@@ -9,9 +9,12 @@ const banners = [
       "Browse verified second-hand vehicles with transparent pricing and trusted sellers.",
     ctaPrimary: "Browse Vehicles",
     ctaSecondary: "Sell Your Vehicle",
-    bg: "from-sky-600 via-blue-600 to-indigo-600",
+    ctaPrimaryHref: "/cars",
+    ctaSecondaryHref: "/sell",
+    bg: "from-emerald-600 via-teal-600 to-cyan-600",
     icon: <ShieldCheck size={28} />,
     stats: ["Verified Sellers", "Fair Price", "Easy Chat"],
+    image: "/logo.png",
   },
   {
     title: "Sell Faster with NextRide",
@@ -19,9 +22,12 @@ const banners = [
       "List your bike or car, receive offers, and sell at the best market value.",
     ctaPrimary: "Sell Now",
     ctaSecondary: "How It Works",
-    bg: "from-emerald-600 via-teal-600 to-cyan-600",
+    ctaPrimaryHref: "/sell",
+    ctaSecondaryHref: "/blog",
+    bg: "from-sky-500 via-blue-300 to-indigo-300",
     icon: <Bike size={28} />,
     stats: ["Quick Listing", "Real Buyers", "Best Deals"],
+    image: "/logo.png",
   },
   {
     title: "Rent Vehicles from Organizations",
@@ -29,9 +35,12 @@ const banners = [
       "Daily, weekly, or monthly rentals from trusted showrooms and agencies.",
     ctaPrimary: "View Rentals",
     ctaSecondary: "For Organizations",
+    ctaPrimaryHref: "/rent",
+    ctaSecondaryHref: "/organizations",
     bg: "from-purple-600 via-fuchsia-600 to-pink-600",
     icon: <Car size={28} />,
     stats: ["Flexible Plans", "Trusted Orgs", "Easy Booking"],
+    image: "/logo.png",
   },
 ];
 
@@ -113,14 +122,14 @@ export default function Banner() {
               {/* CTA */}
               <div className="flex flex-wrap gap-4 pt-2">
                 <a
-                  href="#"
+                  href={current.ctaPrimaryHref || "#"}
                   className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition"
                 >
                   {current.ctaPrimary}
                 </a>
 
                 <a
-                  href="#"
+                  href={current.ctaSecondaryHref || "#"}
                   className="rounded-full border border-white/60 px-7 py-3 text-sm font-medium hover:bg-white/10 transition"
                 >
                   {current.ctaSecondary}
@@ -135,10 +144,17 @@ export default function Banner() {
               transition={{ duration: 0.6 }}
               className="hidden md:flex justify-center"
             >
-              <div className="w-80 h-80 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl flex items-center justify-center">
-                <span className="text-7xl font-bold text-white/70">
-                  {index + 1}
-                </span>
+              <div className="relative w-80 h-80 rounded-3xl bg-white/15 backdrop-blur-md shadow-2xl overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent" />
+                <img
+                  src={current.image || "/logo.png"}
+                  alt="NextRide visual"
+                  className="w-full h-full object-contain p-6"
+                />
+                <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/80 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold">
+                  <span className="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center">{index + 1}</span>
+                  Featured
+                </div>
               </div>
             </motion.div>
           </div>
