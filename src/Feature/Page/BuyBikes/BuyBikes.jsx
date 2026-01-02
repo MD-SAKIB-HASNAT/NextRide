@@ -30,6 +30,7 @@ export default function BuyBikes() {
   const [error, setError] = useState("");
   const [nextCursor, setNextCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -137,7 +138,17 @@ export default function BuyBikes() {
               <p className="text-slate-600 mt-1">Browse available bikes for sale</p>
             </div>
           </div>
-          <p className="text-sm text-slate-500">{bikes.length} bikes found</p>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-sm text-slate-500">{bikes.length} bikes found</p>
+            <button
+              type="button"
+              onClick={() => setShowFilters((prev) => !prev)}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-100 lg:hidden"
+            >
+              <Search size={16} />
+              {showFilters ? "Hide Filters" : "Show Filters"}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -147,10 +158,10 @@ export default function BuyBikes() {
         )}
 
         {/* Main Layout: Sidebar + Products */}
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar Filters */}
-          <div className="w-full lg:w-80 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-20">
+          <div className={`w-full lg:w-80 flex-shrink-0 ${showFilters ? "block" : "hidden"} lg:block`}>
+            <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-20">
               <h2 className="text-lg font-semibold text-slate-900 mb-6">Filters</h2>
 
               {/* All Button */}

@@ -25,98 +25,99 @@ export default function Header() {
     { label: "Sell Vehicle", href: "/sell" },
     { label: "Rent Vehicles", href: "/rent" },
     { label: "Organizations", href: "/organizations" },
-    { label: "Accessories", href: "/accessories" },
+  //  { label: "Accessories", href: "/accessories" },
     { label: "About Us", href: "/about" },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-blue-100 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+        <div className="flex items-center justify-between gap-4">
           
-          <div className="flex items-center">
-            <a href="/" className="flex items-center gap-2">
-              <img
-                src="/logo.png"
-                alt="NextRide logo"
-                className="w-12 h-12 object-contain"
-              />
-              <span className="text-lg font-semibold text-slate-900 hidden sm:block">
-                NextRide
-              </span>
-            </a>
-            
-            <form className="ml-10 hidden md:block w-full max-w-xl relative">
-              <input
-                type="search"
-                placeholder="Search bikes, cars, brands..."
-                className="w-full rounded-full border-2 border-blue-300 px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
-              />
-              <button
-                type="submit"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-sky-500 text-white flex items-center justify-center"
-                aria-label="Search"
-              >
-                <Search size={18} />
-              </button>
-            </form>
-          </div>
+          {/* Logo - always visible */}
+          <a href="/" className="flex items-center gap-2 flex-shrink-0">
+            <img
+              src="/logo.png"
+              alt="NextRide logo"
+              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+            />
+            <span className="text-base sm:text-lg font-semibold text-slate-900 hidden sm:block">
+              NextRide
+            </span>
+          </a>
 
-          <div className="flex items-center justify-end gap-4">
+          {/* Desktop search - hidden on mobile */}
+          <form className="hidden lg:block flex-1 max-w-xl mx-4 relative">
+            <input
+              type="search"
+              placeholder="Search bikes, cars, brands..."
+              className="w-full rounded-full border-2 border-blue-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+            />
+            <button
+              type="submit"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-sky-500 text-white flex items-center justify-center"
+              aria-label="Search"
+            >
+              <Search size={16} />
+            </button>
+          </form>
+
+          {/* Desktop right section */}
+          <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
             <button
               type="button"
               onClick={() => navigate("/subscriptions")}
-              className="hidden md:inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition whitespace-nowrap"
             >
               Subscription
             </button>
-            <div className="hidden md:flex items-center gap-2">
-              <div className="h-9 w-9 rounded-full border border-slate-200 flex items-center justify-center">
-                <Phone size={16} className="text-sky-500" />
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center">
+                <Phone size={14} className="text-sky-500" />
               </div>
-              <div className="text-sm leading-tight">
-                <p className="text-slate-500 text-xs">Support</p>
+              <div className="text-xs leading-tight">
+                <p className="text-slate-500">Support</p>
                 <p className="font-medium text-slate-900">01992403647</p>
               </div>
             </div>
 
             {isLoggedIn ? (
-              <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="inline-flex items-center rounded-full bg-sky-500 px-5 py-2 text-sm text-white font-medium hover:bg-sky-600 transition"
+                  className="inline-flex items-center rounded-full bg-sky-500 px-4 py-2 text-sm text-white font-medium hover:bg-sky-600 transition whitespace-nowrap"
                 >
                   Dashboard
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-2 rounded-full border border-red-300 px-4 py-2 text-sm text-red-600 font-medium hover:bg-red-50 transition"
+                  className="inline-flex items-center gap-1 rounded-full border border-red-300 px-3 py-2 text-sm text-red-600 font-medium hover:bg-red-50 transition whitespace-nowrap"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={14} />
                   Logout
                 </button>
               </div>
             ) : (
               <a
                 href="/login"
-                className="hidden md:inline-flex items-center rounded-full bg-sky-500 px-5 py-2 text-sm text-white font-medium hover:bg-sky-600 transition"
+                className="inline-flex items-center rounded-full bg-sky-500 px-5 py-2 text-sm text-white font-medium hover:bg-sky-600 transition whitespace-nowrap"
               >
                 Login
               </a>
             )}
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-md border border-slate-200"
-            >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
           </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="lg:hidden p-2 rounded-md border border-slate-200 flex-shrink-0"
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
 
-      <nav className="hidden md:block bg-gradient-to-r from-sky-50 to-blue-50 border-t border-sky-100 shadow-sm">
+      <nav className="hidden lg:block bg-gradient-to-r from-sky-50 to-blue-50 border-t border-sky-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center justify-center gap-1">
             {navLinks.map((link) => {
@@ -144,8 +145,26 @@ export default function Header() {
       </nav>
 
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-slate-200">
+        <div className="lg:hidden bg-white border-t border-slate-200">
           <div className="px-4 py-3 space-y-1">
+            {/* Mobile search */}
+            <form className="mb-3">
+              <div className="relative">
+                <input
+                  type="search"
+                  placeholder="Search bikes, cars, brands..."
+                  className="w-full rounded-full border-2 border-blue-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-sky-500 text-white flex items-center justify-center"
+                  aria-label="Search"
+                >
+                  <Search size={16} />
+                </button>
+              </div>
+            </form>
+
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (

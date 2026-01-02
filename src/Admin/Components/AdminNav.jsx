@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, Users, Truck, TrendingUp, Settings, Podcast, Car, Bike, Shield } from 'lucide-react';
+import { BarChart3, Users, Truck, TrendingUp, Settings, Podcast, Car, Bike, Shield, KeySquare } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AdminNav({ sidebarOpen }) {
@@ -34,6 +34,7 @@ export default function AdminNav({ sidebarOpen }) {
       {navItem(<Car size={20} />, 'Car Posts', '/admin/car-posts')}
       {navItem(<Shield size={20} />, 'Organizations', '/admin/organizations')}
       {navItem(<Users size={20} />, 'Users', '/admin/users')}
+      {navItem(<KeySquare size={20} />, 'Rent Vehicles', '/admin/rent-vehicles')}
       
       {navItem(<Truck size={20} />, 'Vehicles Update Requests', '/admin/vehicle-update-requests')}
       {navItem(<TrendingUp size={20} />, 'Analytics', '/admin/analytics')}

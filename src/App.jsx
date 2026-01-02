@@ -29,6 +29,13 @@ import VehicleDetails from "./Public/Pages/VehicleDetails/VehicleDetails";
 import AdminVehicleUpdateRequests from "./Admin/Pages/AdminVehicleUpdateRequests";
 import Subscription from "./Feature/Page/Subscription/Subscription";
 import About from "./Feature/Page/About/About";
+import RentVehicles from "./Feature/Page/RentVehicles/RentVehicles";
+import AddRentVehicle from "./Feature/Page/RentVehicles/AddRentVehicle";
+import AdminRentVehicles from "./Admin/Pages/AdminRentVehicles";
+import RentVehicleDetails from "./Public/Pages/RentVehicles/RentVehicleDetails";
+import OrganizationDetails from "./Public/Pages/Organizations/OrganizationDetails";
+import OrganizationList from "./Feature/Page/Organizations/OrganizationList";
+
 
 
 export default function App() {
@@ -41,6 +48,7 @@ export default function App() {
           <Route path="car-posts" element={<AdminCarPosts />} />
           <Route path="organizations" element={<AdminOrganizations />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="rent-vehicles" element={<AdminRentVehicles />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="vehicle-update-requests" element={<AdminVehicleUpdateRequests />} />
@@ -59,6 +67,11 @@ export default function App() {
           <Route path="/bikes" element={<BuyBikes />} />
           <Route path="/subscriptions" element={<Subscription />} />
           <Route path="/about" element={<About />} />
+          <Route path="/rent/add" element={<AddRentVehicle />} />
+          <Route path="/rent" element={<RentVehicles />} />
+          <Route path="/rent/vehicle/:id" element={<RentVehicleDetails />} />
+          <Route path="/organizations" element={<OrganizationList />} />
+          <Route path="/organizations/:id" element={<OrganizationDetails />} />
           <Route path="/vehicles/:id" element={<VehicleDetails />} />
           <Route path="/seller/:sellerId" element={<SellerProfile />} />
           <Route path="/payment/:id" element={<Payment />} />
