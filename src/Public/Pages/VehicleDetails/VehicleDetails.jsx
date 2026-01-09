@@ -412,64 +412,85 @@ export default function VehicleDetails() {
                     Seller Information
                   </h3>
 
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-slate-700 flex items-center justify-center text-white text-xl font-semibold shadow-lg overflow-hidden">
-                      {vehicle.userId.profilePhoto ? (
-                        <img
-                          src={`${import.meta.env.VITE_API_URL}/${vehicle.userId.profilePhoto}`}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        vehicle.userId.name?.slice(0, 1) || "N"
+                  {localStorage.getItem("user") ? (
+                    <>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-slate-700 flex items-center justify-center text-white text-xl font-semibold shadow-lg overflow-hidden">
+                          {vehicle.userId.profilePhoto ? (
+                            <img
+                              src={`${import.meta.env.VITE_API_URL}/${vehicle.userId.profilePhoto}`}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            vehicle.userId.name?.slice(0, 1) || "N"
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {vehicle.userId.name}
+                          </p>
+                          <p className="text-sm text-slate-500 capitalize">
+                            {vehicle.userId.role}
+                          </p>
+                        </div>
+                      </div>
+
+                      {vehicle.userId.email && (
+                        <div className="mb-3 pb-3 border-b border-slate-100">
+                          <p className="text-xs text-slate-500 mb-1">Email</p>
+                          <p className="text-sm text-slate-700">
+                            {vehicle.userId.email}
+                          </p>
+                        </div>
                       )}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-900">
-                        {vehicle.userId.name}
-                      </p>
-                      <p className="text-sm text-slate-500 capitalize">
-                        {vehicle.userId.role}
-                      </p>
-                    </div>
-                  </div>
 
-                  {vehicle.userId.email && (
-                    <div className="mb-3 pb-3 border-b border-slate-100">
-                      <p className="text-xs text-slate-500 mb-1">Email</p>
-                      <p className="text-sm text-slate-700">
-                        {vehicle.userId.email}
-                      </p>
-                    </div>
-                  )}
+                      {vehicle.phone && (
+                        <div className="mb-4 pb-4 border-b border-slate-100">
+                          <p className="text-xs text-slate-500 mb-1">Phone</p>
+                          <a
+                            href={`tel:${vehicle.phone}`}
+                            className="text-sm text-sky-600 font-medium hover:text-sky-700 flex items-center gap-2"
+                          >
+                            <Phone size={14} />
+                            {vehicle.phone}
+                          </a>
+                        </div>
+                      )}
 
-                  {vehicle.phone && (
-                    <div className="mb-4 pb-4 border-b border-slate-100">
-                      <p className="text-xs text-slate-500 mb-1">Phone</p>
-                      <a
-                        href={`tel:${vehicle.phone}`}
-                        className="text-sm text-sky-600 font-medium hover:text-sky-700 flex items-center gap-2"
+                      {/* Action Buttons */}
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => navigate(`/seller/${vehicle.userId._id}`)}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold rounded-lg hover:from-sky-600 hover:to-blue-700 transition shadow-md"
+                        >
+                          <User size={18} />
+                          View Seller Profile
+                        </button>
+                        <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-sky-500 text-sky-600 font-semibold rounded-lg hover:bg-sky-50 transition">
+                          <MessageCircle size={18} />
+                          Send Message
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Shield size={48} className="mx-auto text-slate-300 mb-4" />
+                      <h4 className="text-lg font-semibold text-slate-900 mb-2">
+                        Login Required
+                      </h4>
+                      <p className="text-sm text-slate-600 mb-4">
+                        Please login to view seller information and contact details
+                      </p>
+                      <button
+                        onClick={() => navigate("/login")}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold rounded-lg hover:from-sky-600 hover:to-blue-700 transition shadow-md"
                       >
-                        <Phone size={14} />
-                        {vehicle.phone}
-                      </a>
+                        <User size={18} />
+                        Login to Continue
+                      </button>
                     </div>
                   )}
-
-                  {/* Action Buttons */}
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => navigate(`/seller/${vehicle.userId._id}`)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold rounded-lg hover:from-sky-600 hover:to-blue-700 transition shadow-md"
-                    >
-                      <User size={18} />
-                      View Seller Profile
-                    </button>
-                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-sky-500 text-sky-600 font-semibold rounded-lg hover:bg-sky-50 transition">
-                      <MessageCircle size={18} />
-                      Send Message
-                    </button>
-                  </div>
                 </div>
               )}
 

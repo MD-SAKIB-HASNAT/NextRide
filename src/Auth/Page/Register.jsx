@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../api/axiosInstance";
 import LoadingSpinner from "../../Components/LoadingSpiner";
+import { validateBangladeshiPhone, normalizeBangladeshiPhone, getPhoneErrorMessage, getPhonePlaceholder } from "../../utils/phoneValidation";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -37,9 +38,26 @@ export default function Register() {
   const [success, setSuccess] = useState("");
   const [registrationData, setRegistrationData] = useState(null);
   const [showOrgPending, setShowOrgPending] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Auto-clean phone number
+    if (name === "phone") {
+      const cleaned = normalizeBangladeshiPhone(value);
+      setForm({ ...form, [name]: cleaned });
+      
+      // Real-time validation
+      if (cleaned && !validateBangladeshiPhone(cleaned)) {
+        setPhoneError(getPhoneErrorMessage());
+      } else {
+        setPhoneError("");
+      }
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+    
     setError("");
   };
 
@@ -62,6 +80,12 @@ export default function Register() {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // Validate phone
+    if (!form.phone || !validateBangladeshiPhone(form.phone)) {
+      setError(getPhoneErrorMessage());
+      return;
+    }
 
     // Validation
     if (form.password !== form.confirmPassword) {
@@ -236,7 +260,7 @@ export default function Register() {
                 value={form.name}
                 required
                 onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="your full name"
                 className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2.5 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
               />
             </div>
@@ -257,10 +281,23 @@ export default function Register() {
                 value={form.phone}
                 required
                 onChange={handleChange}
-                placeholder="+1 (555) 000-0000"
-                className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2.5 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
+                placeholder={getPhonePlaceholder()}
+                className={`w-full rounded-xl border pl-10 pr-4 py-2.5 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:ring-2 transition ${
+                  phoneError
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                    : "border-slate-300 focus:border-sky-500 focus:ring-sky-200"
+                }`}
               />
             </div>
+            {phoneError && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xs text-red-600 mt-1"
+              >
+                {phoneError}
+              </motion.p>
+            )}
           </div>
         </div>
 
@@ -302,8 +339,8 @@ export default function Register() {
                 paddingRight: "2.5rem",
               }}
             >
-              <option value="user">👤 Individual User</option>
-              <option value="organization">🏢 Organization</option>
+              <option value="user">Individual User</option>
+              <option value="organization">Organization</option>
             </select>
           </div>
         </div>

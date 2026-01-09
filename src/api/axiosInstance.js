@@ -19,7 +19,12 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only redirect if 401 and NOT on login/register pages
+    const isAuthPage = window.location.pathname === '/login' || 
+                       window.location.pathname === '/register' ||
+                       window.location.pathname === '/forgot-password';
+    
+    if (error.response?.status === 401 && !isAuthPage) {
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');

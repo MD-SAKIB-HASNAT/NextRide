@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import apiClient from "../../api/axiosInstance";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
@@ -45,15 +45,26 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Login failed");
+      const status = err.response?.status;
+      const message = err.response?.data?.message;
+      
+      if (status === 401) {
+        setError("Invalid email or password. Please try again.");
+      } else if (status === 404) {
+        setError("Account not found. Please check your email or register.");
+      } else if (status === 403) {
+        setError("Your account has been suspended. Contact support.");
+      } else if (message) {
+        setError(message);
+      } else if (err.message === "Network Error") {
+        setError("Unable to connect to server. Please check your internet connection.");
+      } else {
+        setError("Login failed. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
   };
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <motion.form
@@ -156,22 +167,22 @@ export default function Login() {
       {/* Register Link */}
       <p className="text-xs sm:text-sm text-center mt-4 sm:mt-5 text-slate-600">
         Don't have an account?{" "}
-        <a
-          href="/register"
+        <Link
+          to="/register"
           className="text-sky-600 font-bold hover:text-sky-700 hover:underline transition"
         >
           Register here
-        </a>
+        </Link>
       </p>
 
       {/* Forgot Password Link */}
       <p className="text-xs sm:text-sm text-center mt-2 text-slate-600">
-        <a
-          href="/forgot-password"
+        <Link
+          to="/forgot-password"
           className="text-slate-500 hover:text-sky-600 hover:underline transition"
         >
           Forgot password?
-        </a>
+        </Link>
       </p>
     </motion.form>
   );

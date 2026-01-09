@@ -25,6 +25,9 @@ import BuyCars from "./Feature/Page/BuyCars/BuyCars";
 import BuyBikes from "./Feature/Page/BuyBikes/BuyBikes";
 import SellerProfile from "./Feature/Page/SellerProfile/SellerProfile";
 import Payment from "./Feature/Page/Payment/Payment";
+import PaymentSuccess from "./Feature/Page/Payment/PaymentSuccess";
+import PaymentFail from "./Feature/Page/Payment/PaymentFail";
+import PaymentCancel from "./Feature/Page/Payment/PaymentCancel";
 import VehicleDetails from "./Public/Pages/VehicleDetails/VehicleDetails";
 import AdminVehicleUpdateRequests from "./Admin/Pages/AdminVehicleUpdateRequests";
 import Subscription from "./Feature/Page/Subscription/Subscription";
@@ -75,6 +78,9 @@ export default function App() {
           <Route path="/vehicles/:id" element={<VehicleDetails />} />
           <Route path="/seller/:sellerId" element={<SellerProfile />} />
           <Route path="/payment/:id" element={<Payment />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/fail" element={<PaymentFail />} />
+          <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route element={<AuthLayout/>}>
             <Route path="/login" element={<Login/>}/>
             <Route path="/register" element={<Register/>}/>
