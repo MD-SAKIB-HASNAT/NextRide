@@ -9,7 +9,6 @@ import {
   Fuel,
   Phone,
   User,
-  MessageCircle,
   ArrowLeft,
   Check,
   X,
@@ -466,10 +465,6 @@ export default function VehicleDetails() {
                         >
                           <User size={18} />
                           View Seller Profile
-                        </button>
-                        <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-sky-500 text-sky-600 font-semibold rounded-lg hover:bg-sky-50 transition">
-                          <MessageCircle size={18} />
-                          Send Message
                         </button>
                       </div>
                     </>

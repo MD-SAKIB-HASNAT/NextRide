@@ -185,7 +185,7 @@ export default function AdminVehicleUpdateRequests() {
                     <div className="flex flex-col gap-1">
                       <span className="font-semibold">{`${vehicle.make || "Unknown"} ${vehicle.modelName || ""}`.trim()}</span>
                       <span className="text-xs text-slate-500">
-                        {`${vehicle.vehicleType?.toUpperCase() || "TYPE"} • $${vehicle.price ? Number(vehicle.price).toLocaleString() : "N/A"}`}
+                        {`${vehicle.vehicleType?.toUpperCase() || "TYPE"} • tk.${vehicle.price ? Number(vehicle.price).toLocaleString() : "N/A"}`}
                       </span>
                     </div>
                   </td>

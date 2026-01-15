@@ -17,6 +17,7 @@ import AdminCarPosts from "./Admin/Pages/AdminCarPosts";
 import AdminOrganizations from "./Admin/Pages/AdminOrganizations";
 import SellVehicle from "./Feature/Page/SellVehicle/SellVehicle";
 import MyListings from "./Feature/Page/Dashboard/MyListings";
+import MyRentListings from "./Feature/Page/Dashboard/MyRentListings";
 import PendingPayments from "./Feature/Page/Dashboard/PendingPayments";
 import PendingUpdates from "./Feature/Page/Dashboard/PendingUpdates";
 import Analytics from "./Feature/Page/Dashboard/Analytics";
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-listings" element={<MyListings />} />
+          <Route path="/my-rent-listings" element={<MyRentListings />} />
           <Route path="/pending-payments" element={<PendingPayments />} />
           <Route path="/pending-updates" element={<PendingUpdates />} />
           <Route path="/analytics" element={<Analytics />} />

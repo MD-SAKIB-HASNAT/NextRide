@@ -4,7 +4,6 @@ import {
   Car,
   Upload,
   Gauge,
-  DollarSign,
   Calendar,
   MapPin,
   Phone as PhoneIcon,
@@ -240,7 +239,8 @@ export default function SellVehicle() {
       return;
     }
 
-    if (isEditMode && form.images.length === 0 && imagePreview.length === 0) {
+    // Validate at least one image for both new and edit mode
+    if (form.images.length === 0 && imagePreview.length === 0) {
       setError("Please upload at least one image");
       return;
     }
@@ -488,7 +488,7 @@ export default function SellVehicle() {
                 Price (BDT) *
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500" size={18} />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 font-semibold">tk.</span>
                 <input
                   type="number"
                   name="price"
@@ -604,7 +604,7 @@ export default function SellVehicle() {
           <div className="mb-3 sm:mb-4">
             <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
               <Image className="inline mr-2" size={14} />
-              Vehicle Images * ({form.images.length}/5)
+              Vehicle Images * (Required - {form.images.length}/5)
             </label>
             <label className="flex flex-col items-center justify-center w-full p-2.5 sm:p-3 border-2 border-dashed border-sky-300 rounded-xl cursor-pointer hover:border-sky-500 hover:bg-sky-50 transition bg-sky-50/50">
               <Upload className="text-sky-500 mb-2" size={20} />
@@ -831,12 +831,12 @@ export default function SellVehicle() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1.5">
-            {isEditMode ? "Update Requested!" : "Listing Posted!"}
+            {isEditMode ? "Update Requested!" : "Listing Submitted!"}
           </h2>
           <p className="text-sm sm:text-base text-slate-500 mb-5 sm:mb-6 px-2">
             {isEditMode 
               ? "Your changes have been submitted. An admin will review and approve them soon."
-              : "Your vehicle listing has been successfully posted."}
+              : "Your listing has been submitted successfully. Please complete the platform fee payment and wait for admin approval to go live."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -859,8 +859,8 @@ export default function SellVehicle() {
         {!isEditMode && showPaymentModal && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Complete Payment</h3>
-              <p className="text-sm text-slate-600 mb-4">Activate your listing by paying now, or pay later from your dashboard.</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Platform Fee Payment Required</h3>
+              <p className="text-sm text-slate-600 mb-4">To activate your listing, please complete the platform fee payment. Your listing will go live after payment and admin approval.</p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setShowPaymentModal(false)}

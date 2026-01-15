@@ -35,6 +35,13 @@ export default function AddRentVehicle() {
     setError("");
     setSuccess("");
 
+    // Validate at least one image is uploaded
+    if (images.length === 0) {
+      setError("Please upload at least one image of the vehicle");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const formPayload = new FormData();
       formPayload.append("vehicleModel", formData.vehicleModel);
@@ -184,7 +191,7 @@ export default function AddRentVehicle() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Images (optional, max 5)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Images (required, at least 1, max 5) *</label>
             <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center">
               <Upload size={24} className="mx-auto text-slate-400 mb-2" />
               <input

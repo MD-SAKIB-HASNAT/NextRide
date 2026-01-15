@@ -171,7 +171,7 @@ export default function AdminRentVehicles() {
                   <td className="px-4 py-3 text-sm text-slate-700">{vehicle.vehicleType}</td>
                   <td className="px-4 py-3 text-sm text-slate-700">{vehicle.address}</td>
                   <td className="px-4 py-3 text-sm text-slate-700">{vehicle.contactNumber}</td>
-                  <td className="px-4 py-3 text-sm text-slate-900 font-semibold">${vehicle.pricePerDay}</td>
+                  <td className="px-4 py-3 text-sm text-slate-900 font-semibold">tk.{vehicle.pricePerDay}</td>
                   <td className="px-4 py-3 text-sm text-slate-700 capitalize">{vehicle.availability}</td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${STATUS_BADGES[vehicle.status] || 'bg-slate-100 text-slate-700'}`}>

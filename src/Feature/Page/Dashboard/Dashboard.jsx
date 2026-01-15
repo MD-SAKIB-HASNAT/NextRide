@@ -9,6 +9,7 @@ import {
   Shield,
   User,
   Clock,
+  Truck,
 } from "lucide-react";
 import apiClient from "../../../api/axiosInstance";
 
@@ -22,6 +23,7 @@ export default function Dashboard() {
     carCount: 0,
     totalCount: 0,
     pendingCount: 0,
+    rentVehicleCount: 0,
   });
 
 
@@ -53,6 +55,7 @@ export default function Dashboard() {
           carCount: summary.carPostCount ?? 0,
           totalCount: summary.totalListings ?? 0,
           pendingCount: summary.pendingCount ?? 0,
+          rentVehicleCount: summary.rentVehicleCount ?? 0,
         });
       } catch (err) {
         console.error("Failed to fetch user summary:", err);
@@ -193,6 +196,23 @@ export default function Dashboard() {
                 <p className="text-xs text-slate-400 mt-1">Check update requests</p>
               </button>
             </div>
+
+            {user?.role === "organization" && (
+              <div className="grid grid-cols-1 gap-4">
+                <button
+                  type="button"
+                  onClick={() => navigate("/my-rent-listings")}
+                  className="text-left bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-3xl shadow-lg p-6 hover:-translate-y-0.5 transition transform cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-emerald-100">Manage Rent Vehicles</p>
+                    <Truck size={22} />
+                  </div>
+                  <h3 className="text-3xl font-bold mt-2">{stats.rentVehicleCount}</h3>
+                  <p className="text-xs text-emerald-200 mt-1">Control vehicle availability</p>
+                </button>
+              </div>
+            )}
           </main>
         </div>
       </div>

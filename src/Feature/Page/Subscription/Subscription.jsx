@@ -4,7 +4,7 @@ import { CheckCircle2, Sparkles, Shield, Rocket } from "lucide-react";
 const plans = [
   {
     name: "Starter",
-    price: "$9/mo",
+    price: "tk.9/mo",
     badge: "Best for individuals",
     perks: [
       "Up to 10 listings per month",
@@ -17,7 +17,7 @@ const plans = [
   },
   {
     name: "Growth",
-    price: "$19/mo",
+    price: "tk.19/mo",
     badge: "Popular for small teams",
     perks: [
       "Up to 30 listings per month",
@@ -32,7 +32,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$39/mo",
+    price: "tk.39/mo",
     badge: "For power sellers",
     perks: [
       "Unlimited listings",

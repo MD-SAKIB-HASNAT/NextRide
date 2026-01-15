@@ -95,7 +95,7 @@ export default function RentVehicleDetails() {
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">{vehicle.vehicleModel}</h1>
               <p className="text-sm text-slate-600">Type: {vehicle.vehicleType}</p>
               <p className="text-2xl font-bold text-slate-900">
-                ${vehicle.pricePerDay}
+                tk.{vehicle.pricePerDay}
                 <span className="text-sm font-normal text-slate-500"> / day</span>
               </p>
               <p className="text-sm text-slate-700 leading-relaxed">

@@ -12,6 +12,8 @@ export default function RentVehicles() {
   const [error, setError] = useState("");
   const [pageInfo, setPageInfo] = useState({ hasNextPage: false, nextCursor: null });
   const [filters, setFilters] = useState({ vehicleType: "", availability: "", search: "" });
+  
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   useEffect(() => {
     fetchVehicles();
@@ -68,13 +70,15 @@ export default function RentVehicles() {
             <h1 className="text-3xl font-bold text-slate-900">Rent Vehicles</h1>
             <p className="text-slate-500 mt-2">Find and list vehicles available for rent</p>
           </div>
-          <button
-            onClick={() => navigate("/rent/add")}
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-white text-sm font-semibold hover:bg-slate-800 transition shadow-sm"
-          >
-            <Plus size={18} />
-            Add Vehicle
-          </button>
+          {user?.role === "organization" && (
+            <button
+              onClick={() => navigate("/rent/add")}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-white text-sm font-semibold hover:bg-slate-800 transition shadow-sm"
+            >
+              <Plus size={18} />
+              Add Vehicle
+            </button>
+          )}
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2 items-center">
@@ -174,7 +178,7 @@ export default function RentVehicles() {
                 </p>
 
                 <p className="text-xl font-bold text-slate-900 mt-3">
-                  ${vehicle.pricePerDay} <span className="text-sm font-normal text-slate-500">/day</span>
+                  tk.{vehicle.pricePerDay} <span className="text-sm font-normal text-slate-500">/day</span>
                 </p>
 
                 {vehicle.description && (
