@@ -197,6 +197,19 @@ export default function Dashboard() {
               </button>
             </div>
 
+            <button
+              type="button"
+              onClick={() => navigate("/payment-history")}
+              className="w-full text-left bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-3xl shadow-lg p-6 hover:-translate-y-0.5 transition transform cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-purple-100">Payment History</p>
+                <CreditCard size={22} />
+              </div>
+              <h3 className="text-2xl font-bold mt-2">View All Transactions</h3>
+              <p className="text-xs text-purple-200 mt-1">Track all your payments and receipts</p>
+            </button>
+
             {user?.role === "organization" && (
               <div className="grid grid-cols-1 gap-4">
                 <button

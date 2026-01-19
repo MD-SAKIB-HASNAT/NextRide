@@ -20,6 +20,7 @@ import MyListings from "./Feature/Page/Dashboard/MyListings";
 import MyRentListings from "./Feature/Page/Dashboard/MyRentListings";
 import PendingPayments from "./Feature/Page/Dashboard/PendingPayments";
 import PendingUpdates from "./Feature/Page/Dashboard/PendingUpdates";
+import PaymentHistory from "./Feature/Page/Dashboard/PaymentHistory";
 import Analytics from "./Feature/Page/Dashboard/Analytics";
 import EditProfile from "./Feature/Page/Dashboard/EditProfile";
 import BuyCars from "./Feature/Page/BuyCars/BuyCars";
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/my-rent-listings" element={<MyRentListings />} />
           <Route path="/pending-payments" element={<PendingPayments />} />
           <Route path="/pending-updates" element={<PendingUpdates />} />
+          <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/sell" element={<SellVehicle />} />

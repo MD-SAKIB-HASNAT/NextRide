@@ -25,10 +25,12 @@ export default function PendingUpdates() {
         params.append("cursor", cursor);
       }
 
-      const { data } = await apiClient.get(`/vehicles/updates-requests/list?${params}`);
+      const response = await apiClient.get(`/vehicles/updates-requests/list?${params}`);
+      const responseData = response.data;
       
-      const items = (data && data.data) ? data.data : [];
-      const pageInfo = (data && data.pageInfo) ? data.pageInfo : {};
+      // Handle both response structures
+      const items = responseData?.data || responseData || [];
+      const pageInfo = responseData?.pageInfo || { hasNextPage: false, nextCursor: null };
       
       if (cursor) {
         setUpdates(prev => [...prev, ...items]);
@@ -38,8 +40,11 @@ export default function PendingUpdates() {
       
       setNextCursor(pageInfo.nextCursor || null);
       setHasMore(!!pageInfo.hasNextPage);
+      setError("");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load pending updates");
+      console.error("Error fetching updates:", err);
+      const errorMsg = err.response?.data?.message || err.message || "Failed to load pending updates";
+      setError(errorMsg);
     } finally {
       setLoading(false);
       setLoadingMore(false);

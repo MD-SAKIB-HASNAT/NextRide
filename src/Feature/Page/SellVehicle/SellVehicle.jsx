@@ -78,6 +78,7 @@ export default function SellVehicle() {
     images: [],
     video: null,
   });
+  const [isCustomMake, setIsCustomMake] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imagePreview, setImagePreview] = useState([]);
@@ -104,11 +105,20 @@ export default function SellVehicle() {
     }
   }, [isEditMode, vehicleId]);
 
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
+
   const loadVehicle = async () => {
     try {
       const response = await apiClient.get(`/vehicles/${vehicleId}`);
       const vehicle = response.data;
       setExistingVehicle(vehicle);
+      
+      // Check if the brand is custom (not in the predefined list)
+      const isCustomBrand = !brandsByType[vehicle.vehicleType].includes(vehicle.make);
+      setIsCustomMake(isCustomBrand);
       
       // Pre-fill form with existing data
       setForm({
@@ -148,6 +158,17 @@ export default function SellVehicle() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+    setError("");
+  };
+
+  const handleMakeSelect = (value) => {
+    if (value === "custom") {
+      setIsCustomMake(true);
+      setForm({ ...form, make: "" });
+    } else {
+      setIsCustomMake(false);
+      setForm({ ...form, make: value });
+    }
     setError("");
   };
 
@@ -396,7 +417,10 @@ export default function SellVehicle() {
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <button
                 type="button"
-                onClick={() => setForm({ ...form, vehicleType: "car", make: "" })}
+                onClick={() => {
+                  setIsCustomMake(false);
+                  setForm({ ...form, vehicleType: "car", make: "" });
+                }}
                 className={`p-2.5 sm:p-3 rounded-xl border-2 transition font-medium text-sm sm:text-base ${
                   form.vehicleType === "car"
                     ? "border-sky-500 bg-sky-50 text-sky-700"
@@ -407,7 +431,10 @@ export default function SellVehicle() {
               </button>
               <button
                 type="button"
-                onClick={() => setForm({ ...form, vehicleType: "bike", make: "" })}
+                onClick={() => {
+                  setIsCustomMake(false);
+                  setForm({ ...form, vehicleType: "bike", make: "" });
+                }}
                 className={`p-2.5 sm:p-3 rounded-xl border-2 transition font-medium text-sm sm:text-base ${
                   form.vehicleType === "bike"
                     ? "border-sky-500 bg-sky-50 text-sky-700"
@@ -426,8 +453,8 @@ export default function SellVehicle() {
               </label>
               <select
                 name="make"
-                value={form.make}
-                onChange={handleChange}
+                value={isCustomMake ? "custom" : form.make}
+                onChange={(e) => handleMakeSelect(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 bg-slate-50 text-slate-800 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition appearance-none cursor-pointer"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230ea5e9' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E")`,
@@ -443,8 +470,30 @@ export default function SellVehicle() {
                     {brand}
                   </option>
                 ))}
+                <option value="custom">+ Add Custom Brand</option>
               </select>
+
+              {isCustomMake && (
+                <div className="mt-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                    Enter Brand Name *
+                  </label>
+                  <div className="relative">
+                    <Car className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500" size={18} />
+                    <input
+                      type="text"
+                      name="make"
+                      value={form.make}
+                      onChange={handleChange}
+                      placeholder="e.g., Tesla, Lamborghini"
+                      className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2.5 text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
             </div>
+
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
                 Model *
@@ -737,7 +786,10 @@ export default function SellVehicle() {
             <div className="bg-slate-50 rounded-xl p-4">
               <h3 className="font-semibold text-slate-900 mb-3">Vehicle Details</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                
+                <div>
+                  <p className="text-slate-500">Brand</p>
+                  <p className="font-medium text-slate-900">{form.make}</p>
+                </div>
                 <div>
                   <p className="text-slate-500">Model</p>
                   <p className="font-medium text-slate-900">{form.modelName}</p>

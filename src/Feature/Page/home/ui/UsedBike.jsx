@@ -1,45 +1,37 @@
-import React from "react";
-
-const bikes = [
-  {
-    id: 1,
-    name: "TVS Apache RTR 160 4V DD X-Connect ABS",
-    price: "৳ 1,78,000",
-    image: "https://images.unsplash.com/photo-1609630875171-b1321377ee65",
-  },
-  {
-    id: 2,
-    name: "Yamaha R15 V3.0 Dual ABS",
-    price: "৳ 3,80,000",
-    image: "https://images.unsplash.com/photo-1622185135505-2d795003994a",
-  },
-  {
-    id: 3,
-    name: "Yamaha FZS FI V3 ABS BS6",
-    price: "৳ 2,34,000",
-    image: "https://images.unsplash.com/photo-1622185135505-2d795003994a",
-  },
-  {
-    id: 4,
-    name: "Bajaj Pulsar 150 Twin Disc ABS",
-    price: "৳ 1,74,000",
-    image: "https://images.unsplash.com/photo-1622185135505-2d795003994a",
-  },
-  {
-    id: 5,
-    name: "Bajaj Avenger 160 ABS",
-    price: "৳ 1,99,000",
-    image: "https://images.unsplash.com/photo-1622185135505-2d795003994a",
-  },
-  {
-    id: 6,
-    name: "Suzuki Gixxer DD Fi ABS",
-    price: "৳ 2,18,000",
-    image: "https://images.unsplash.com/photo-1622185135505-2d795003994a",
-  },
-];
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import apiClient from "@/api/axiosInstance";
 
 export default function UsedBike() {
+  const [bikes, setBikes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBikes = async () => {
+      try {
+        const response = await apiClient.get("/vehicles/public/filtered-listings", {
+          params: {
+            vehicleType: "bike",
+            limit: 6,
+          },
+        });
+        console.log(response.data.data);
+        setBikes(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching bikes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBikes();
+  }, []);
+
+  const handleBikeClick = (bikeId) => {
+    navigate(`/vehicles/${bikeId}`);
+  };
+
   return (
     <section className="w-full bg-slate-50 py-10">
       <div className="max-w-7xl mx-auto px-6">
@@ -74,32 +66,47 @@ export default function UsedBike() {
           </div>
 
           <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {bikes.map((bike) => (
-              <div
-                key={bike.id}
-                className="bg-white rounded-xl border border-blue-200 shadow-lg p-4"
-              >
-                <span className="inline-block mb-2 rounded bg-slate-600 px-3 py-1 text-xs font-semibold text-white">
-                  Sell
-                </span>
-
-                <img
-                  src={bike.image}
-                  alt={bike.name}
-                  className="w-full h-32 object-contain mb-4"
-                />
-
-                <h4 className="text-sm font-medium text-slate-900 mb-2">
-                  {bike.name}
-                </h4>
-
-                <p className="text-xs text-slate-500 mb-1">Get upto</p>
-
-                <p className="text-lg font-semibold text-slate-800">
-                  {bike.price}
-                </p>
+            {loading ? (
+              <div className="col-span-full text-center py-8 text-slate-500">
+                Loading bikes...
               </div>
-            ))}
+            ) : bikes.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-slate-500">
+                No bikes available
+              </div>
+            ) : (
+              bikes.map((bike) => (
+                <div
+                  key={bike._id}
+                  onClick={() => handleBikeClick(bike._id)}
+                  className="bg-white rounded-xl border border-blue-200 shadow-lg p-4 cursor-pointer hover:shadow-blue-300/50 hover:shadow-xl transition-all duration-300"
+                >
+                  <span className="inline-block mb-2 rounded bg-slate-600 px-3 py-1 text-xs font-semibold text-white">
+                    Sell
+                  </span>
+
+                  <img
+                    src={
+                      bike.images && bike.images.length > 0
+                        ? `${import.meta.env.VITE_API_URL}/uploads/${bike.images[0]}`
+                        : "https://via.placeholder.com/300x200?text=No+Image"
+                    }
+                    alt={bike.title}
+                    className="w-full h-32 object-cover mb-4 rounded"
+                  />
+
+                  <h4 className="text-sm font-medium text-slate-900 mb-2">
+                    {bike.title}
+                  </h4>
+
+                  <p className="text-xs text-slate-500 mb-1">Get upto</p>
+
+                  <p className="text-lg font-semibold text-slate-800">
+                    ৳ {bike.price?.toLocaleString() || "N/A"}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
