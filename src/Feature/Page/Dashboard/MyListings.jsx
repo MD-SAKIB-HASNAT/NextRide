@@ -16,6 +16,7 @@ export default function MyListings() {
   const [error, setError] = useState("");
   const [nextCursor, setNextCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     const fetchMyListings = async () => {
@@ -94,6 +95,31 @@ export default function MyListings() {
       searchParams.set("type", value);
     }
     setSearchParams(searchParams);
+  };
+
+  const markAsSold = async (id) => {
+    const confirmSale = window.confirm("Mark this listing as sold?");
+    if (!confirmSale || updatingId) return;
+
+    try {
+      setUpdatingId(id);
+      await apiClient.patch(`/vehicles/${id}/mark-sold`);
+      setListings((prev) => {
+        const updated = prev.map((item) =>
+          item._id === id ? { ...item, status: "sold" } : item
+        );
+
+        if (statusFilter !== "all" && statusFilter !== "sold") {
+          return updated.filter((item) => item.status === statusFilter);
+        }
+
+        return updated;
+      });
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to mark as sold");
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   const badgeClass = (status) => {
@@ -189,6 +215,16 @@ export default function MyListings() {
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">
+                {item.status !== "sold" && (
+                  <button
+                    onClick={() => markAsSold(item._id)}
+                    disabled={updatingId === item._id}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <CheckCircle size={14} />
+                    {updatingId === item._id ? "Marking..." : "Mark Sold"}
+                  </button>
+                )}
                 <button
                   onClick={() => navigate(`/sell/${item._id}`)}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 text-xs font-semibold hover:bg-sky-100"

@@ -20,39 +20,28 @@ export default function AdminAnalytics() {
     const fetchAnalytics = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual endpoint
-        setAnalytics({
-          totalRevenue: 245600,
-          totalUsers: 2450,
-          totalVehicles: 1280,
-          activeListings: 856,
-          monthlyGrowth: 12.5,
-          vehicleSalesChart: [
-            { month: 'Jan', sales: 245 },
-            { month: 'Feb', sales: 318 },
-            { month: 'Mar', sales: 267 },
-            { month: 'Apr', sales: 392 },
-            { month: 'May', sales: 456 },
-            { month: 'Jun', sales: 523 },
-          ],
-          userGrowthChart: [
-            { month: 'Jan', users: 450 },
-            { month: 'Feb', users: 628 },
-            { month: 'Mar', users: 745 },
-            { month: 'Apr', users: 1023 },
-            { month: 'May', users: 1456 },
-            { month: 'Jun', users: 2450 },
-          ],
-        });
+        setError('');
+        const response = await apiClient.get('/admin/dashboard/analytics');
+        setAnalytics(response.data);
       } catch (err) {
         console.error('Failed to fetch analytics:', err);
-        setError('Failed to load analytics');
+        setError(err.response?.data?.message || 'Failed to load analytics');
       } finally {
         setLoading(false);
       }
     };
     fetchAnalytics();
   }, []);
+
+  const maxVehicleSales = Math.max(
+    analytics.vehicleSalesChart.reduce((max, item) => Math.max(max, item.sales), 0),
+    1
+  );
+
+  const maxUsers = Math.max(
+    analytics.userGrowthChart.reduce((max, item) => Math.max(max, item.users), 0),
+    1
+  );
 
   if (loading) {
     return <LoadingSpinner />;
@@ -92,6 +81,9 @@ export default function AdminAnalytics() {
             <div>
               <p className="text-slate-500 text-sm font-medium">Total Users</p>
               <p className="text-3xl font-bold text-slate-900 mt-2">{analytics.totalUsers.toLocaleString()}</p>
+              <p className="text-xs font-medium text-emerald-600 mt-1">
+                {analytics.monthlyGrowth >= 0 ? '+' : ''}{analytics.monthlyGrowth}% vs last month
+              </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
               <Users className="text-blue-600" size={24} />
@@ -136,9 +128,9 @@ export default function AdminAnalytics() {
               <div key={item.month} className="flex items-center gap-4">
                 <span className="w-12 text-sm font-medium text-slate-600">{item.month}</span>
                 <div className="flex-1 h-8 bg-slate-100 rounded-lg overflow-hidden">
-                  <div 
-                    className="h-full bg-linear-to-r from-sky-500 to-blue-600"
-                    style={{ width: `${(item.sales / 523) * 100}%` }}
+                  <div
+                    className="h-full bg-gradient-to-r from-sky-500 to-blue-600"
+                    style={{ width: `${(item.sales / maxVehicleSales) * 100}%` }}
                   ></div>
                 </div>
                 <span className="w-12 text-sm font-semibold text-slate-900 text-right">{item.sales}</span>
@@ -155,9 +147,9 @@ export default function AdminAnalytics() {
               <div key={item.month} className="flex items-center gap-4">
                 <span className="w-12 text-sm font-medium text-slate-600">{item.month}</span>
                 <div className="flex-1 h-8 bg-slate-100 rounded-lg overflow-hidden">
-                  <div 
-                    className="h-full bg-linear-to-r from-emerald-500 to-green-600"
-                    style={{ width: `${(item.users / 2450) * 100}%` }}
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-green-600"
+                    style={{ width: `${(item.users / maxUsers) * 100}%` }}
                   ></div>
                 </div>
                 <span className="w-16 text-sm font-semibold text-slate-900 text-right">{item.users}</span>

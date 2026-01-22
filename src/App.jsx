@@ -12,6 +12,7 @@ import AdminOverview from "./Admin/Dashboard/AdminOverview";
 import AdminSettings from "./Admin/Settings/AdminSettings";
 import AdminUsers from "./Admin/Pages/AdminUsers";
 import AdminAnalytics from "./Admin/Pages/AdminAnalytics";
+import AdminPaymentHistory from "./Admin/Pages/AdminPaymentHistory";
 import AdminBikePosts from "./Admin/Pages/AdminBikePosts";
 import AdminCarPosts from "./Admin/Pages/AdminCarPosts";
 import AdminOrganizations from "./Admin/Pages/AdminOrganizations";
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="rent-vehicles" element={<AdminRentVehicles />} />
           <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="payment-history" element={<AdminPaymentHistory />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="vehicle-update-requests" element={<AdminVehicleUpdateRequests />} />
         </Route>

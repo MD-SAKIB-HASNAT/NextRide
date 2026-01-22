@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, FileText, Shield, XCircle } from 'lucide-react';
+import { CheckCircle2, FileText, Shield, XCircle, Plus } from 'lucide-react';
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import apiClient from '../../api/axiosInstance';
+import AddOrganizationModal from '../Components/AddOrganizationModal';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -17,6 +18,8 @@ export default function AdminOrganizations() {
   const [limit] = useState(10);
   const [filters, setFilters] = useState({ search: '', status: '' });
   const [initialized, setInitialized] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const fetchOrganizations = async (cursorToLoad = null, isLoadMore = false) => {
     try {
@@ -98,6 +101,12 @@ export default function AdminOrganizations() {
     return map[status] || 'bg-slate-100 text-slate-700';
   };
 
+  const handleModalSuccess = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(''), 5000);
+    fetchOrganizations(null);
+  };
+
   if (!initialized && loading) return <LoadingSpinner />;
 
   return (
@@ -108,6 +117,12 @@ export default function AdminOrganizations() {
           <p className="text-slate-600 text-sm">Review and approve organization accounts.</p>
         </div>
         <div className="flex flex-wrap gap-2 items-center">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-3 py-2 text-sm rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:shadow-lg transition-all inline-flex items-center gap-2 font-medium"
+          >
+            <Plus size={18} /> Add Organization
+          </button>
           <input
             name="search"
             value={filters.search}
@@ -137,6 +152,9 @@ export default function AdminOrganizations() {
 
       {error && (
         <div className="p-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-700">{error}</div>
+      )}
+      {successMessage && (
+        <div className="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700">{successMessage}</div>
       )}
       {actionMessage && (
         <div className="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700">{actionMessage}</div>
@@ -231,6 +249,12 @@ export default function AdminOrganizations() {
           </button>
         </div>
       </div>
+
+      <AddOrganizationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 }
