@@ -54,6 +54,23 @@ export default function SellerProfile() {
     fetchSellerVehicles();
   }, [sellerId]);
 
+  const toWhatsAppInternational = (phone) => {
+    const raw = (phone || "").replace(/[^\d]/g, "");
+    if (!raw) return "";
+    if (raw.startsWith("880")) return raw;
+    if (raw.startsWith("88")) return "880" + raw.slice(2);
+    if (raw.startsWith("0")) return "880" + raw.slice(1);
+    return raw; // fallback: assume already includes country code
+  };
+
+  const handleWhatsAppContact = () => {
+    const intl = toWhatsAppInternational(seller?.phone);
+    if (!intl) return;
+    const msg = `Hi ${seller?.name || "there"}, I'm interested in your listings on NextRide.`;
+    const url = `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -135,10 +152,14 @@ export default function SellerProfile() {
                       )}
                     </div>
                   </div>
-                  {/* Message Button */}
-                  <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition transform">
+                  {/* WhatsApp Message Button */}
+                  <button
+                    onClick={handleWhatsAppContact}
+                    disabled={!seller.phone}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition transform disabled:opacity-50"
+                  >
                     <MessageCircle size={20} />
-                    Send Message
+                    WhatsApp Message
                   </button>
                 </div>
 
@@ -156,14 +177,26 @@ export default function SellerProfile() {
                   {seller.phone && (
                     <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                       <Phone size={20} className="text-sky-500 mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">Phone</p>
-                        <a
-                          href={`tel:${seller.phone}`}
-                          className="text-sm text-sky-600 font-medium hover:text-sky-700"
-                        >
-                          {seller.phone}
-                        </a>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 w-full">
+                        <div>
+                          <p className="text-xs text-slate-500 mb-1">Phone</p>
+                          <a
+                            href={`tel:${seller.phone}`}
+                            className="text-sm text-sky-600 font-medium hover:text-sky-700"
+                          >
+                            {seller.phone}
+                          </a>
+                        </div>
+                        <div className="mt-2 sm:mt-0 sm:ml-auto">
+                          <a
+                            href={`https://wa.me/${toWhatsAppInternational(seller.phone)}?text=${encodeURIComponent("Hi, I'm interested in your listings on NextRide.")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition"
+                          >
+                            <MessageCircle size={16} /> WhatsApp
+                          </a>
+                        </div>
                       </div>
                     </div>
                   )}

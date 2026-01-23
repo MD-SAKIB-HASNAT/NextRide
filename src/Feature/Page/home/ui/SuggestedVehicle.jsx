@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const vehicles = [
   {
@@ -44,6 +45,12 @@ const vehicles = [
 ];
 
 export default function SuggestedVehicle() {
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate('/cars');
+  };
+
   return (
     <section className="w-full bg-slate-50 py-14">
       <div className="max-w-7xl mx-auto px-6">
@@ -121,7 +128,10 @@ export default function SuggestedVehicle() {
         </div>
 
         <div className="flex justify-center mt-12">
-          <button className="rounded-full border border-sky-600 px-8 py-3 text-sm font-semibold text-sky-600 hover:bg-sky-50 transition">
+          <button
+            onClick={handleViewAll}
+            className="rounded-full border border-sky-600 px-8 py-3 text-sm font-semibold text-sky-600 hover:bg-sky-50 transition"
+          >
             View All Vehicles
           </button>
         </div>

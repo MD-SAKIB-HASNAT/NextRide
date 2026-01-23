@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Upload, ArrowLeft } from "lucide-react";
+import { Upload, ArrowLeft, CheckCircle, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../../api/axiosInstance";
 
@@ -17,7 +17,7 @@ export default function AddRentVehicle() {
   const [images, setImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,8 +58,7 @@ export default function AddRentVehicle() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setSuccess("Vehicle submitted for approval.");
-      setTimeout(() => navigate("/rent"), 800);
+      setSuccess(true);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to add rent vehicle");
     } finally {
@@ -88,9 +87,26 @@ export default function AddRentVehicle() {
             {error}
           </div>
         )}
+
+        {/* Success Dialog */}
         {success && (
-          <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700">
-            {success}
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-sm mx-4 text-center">
+              <div className="flex justify-center mb-4">
+                <CheckCircle size={64} className="text-emerald-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Success!</h2>
+              <p className="text-slate-600 mb-2">Your vehicle has been submitted successfully.</p>
+              <p className="text-slate-500 text-sm mb-6">
+                Please wait for admin approval. We'll review your vehicle and notify you shortly.
+              </p>
+              <button
+                onClick={() => navigate("/rent")}
+                className="w-full px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition"
+              >
+                Go to Rent Vehicles
+              </button>
+            </div>
           </div>
         )}
 

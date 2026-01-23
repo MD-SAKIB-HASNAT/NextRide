@@ -4,11 +4,11 @@ import { CheckCircle2, Sparkles, Shield, Rocket } from "lucide-react";
 const plans = [
   {
     name: "Starter",
-    price: "tk.9/mo",
+    price: "tk.90/mo",
     badge: "Best for individuals",
     perks: [
       "Up to 10 listings per month",
-      "Platform fee reduced to 8%",
+      "No platform fee",
       "Standard support",
       "Basic visibility boost",
     ],
@@ -17,13 +17,13 @@ const plans = [
   },
   {
     name: "Growth",
-    price: "tk.19/mo",
+    price: "tk.190/mo",
     badge: "Popular for small teams",
     perks: [
       "Up to 30 listings per month",
-      "Platform fee reduced to 5%",
+      "Platform fee reduced",
       "Priority chat & email support",
-      "Featured placement 3x/mo",
+      "Featured placement",
       "Bulk upload assistant",
     ],
     accent: "from-emerald-500/10 to-teal-500/10",
@@ -32,11 +32,11 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "tk.39/mo",
+    price: "tk.390/mo",
     badge: "For power sellers",
     perks: [
       "Unlimited listings",
-      "Platform fee reduced to 3%",
+      "Platform fee reduced",
       "Dedicated success manager",
       "Always-on featured placement",
       "Advanced analytics & reports",
@@ -54,7 +54,7 @@ export default function Subscription() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-100 text-sky-700 text-sm font-semibold">
             <Sparkles size={16} />
-            Subscription Plans
+            Upcoming Subscription Plans
           </div>
           <h1 className="mt-4 text-4xl font-bold text-slate-900">Scale your selling with the right plan</h1>
           <p className="mt-3 text-slate-600 max-w-2xl mx-auto">

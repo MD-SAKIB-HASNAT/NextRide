@@ -146,10 +146,10 @@ export default function AdminBikePosts() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Vehicle Status</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Post Status</label>
             <select
-              value={filters.vehicleStatus}
-              onChange={(e) => setFilters({ ...filters, vehicleStatus: e.target.value })}
+              value={filters.postStatus}
+              onChange={(e) => setFilters({ ...filters, postStatus: e.target.value })}
               className="w-full rounded-lg border border-slate-300 px-4 py-2 bg-slate-50 text-slate-800 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
             >
               <option value="all">All Vehicle Status</option>

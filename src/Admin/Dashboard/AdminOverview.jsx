@@ -66,7 +66,7 @@ export default function AdminOverview() {
             />
             <StatCard
               title="Platform Fee Rate"
-              value={`${((settings?.platformFeeRate ?? 0) * 100).toFixed(1)}%`}
+              value={`${((settings?.platformFeeRate ?? 0)).toFixed(1)}%`}
               tone="from-rose-500 to-red-600"
               icon={<BarChart3 size={20} />}
             />

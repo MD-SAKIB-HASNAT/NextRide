@@ -31,6 +31,10 @@ export default function UsedCar() {
     navigate(`/vehicles/${carId}`);
   };
 
+  const handleViewAll = () => {
+    navigate('/cars');
+  };
+
   return (
     <section className="w-full bg-slate-50 py-10">
       <div className="max-w-7xl mx-auto px-6">
@@ -38,7 +42,10 @@ export default function UsedCar() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-slate-900">Car</h2>
 
-          <button className="rounded-md bg-sky-600 px-5 py-2 text-sm font-semibold text-white hover:bg-sky-700">
+          <button
+            onClick={handleViewAll}
+            className="rounded-md bg-sky-600 px-5 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+          >
             View all
           </button>
         </div>
