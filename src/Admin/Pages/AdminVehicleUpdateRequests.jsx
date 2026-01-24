@@ -56,7 +56,14 @@ export default function AdminVehicleUpdateRequests() {
   const handleAction = async (requestId, action) => {
     try {
       let note;
-      if (action === "reject") {
+      
+      // Confirm action
+      if (action === "approve") {
+        const confirmed = window.confirm(
+          'Are you sure you want to approve this vehicle update? The seller will receive a confirmation email.'
+        );
+        if (!confirmed) return;
+      } else if (action === "reject") {
         note = window.prompt("Add a note for rejection (optional):", "");
         if (note === null) {
           return;

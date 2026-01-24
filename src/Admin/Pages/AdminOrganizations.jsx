@@ -61,6 +61,12 @@ export default function AdminOrganizations() {
   }, [filters]);
 
   const handleApprove = async (id) => {
+    const confirmed = window.confirm(
+      'Are you sure you want to approve this organization? They will receive a confirmation email.'
+    );
+    
+    if (!confirmed) return;
+
     try {
       await apiClient.patch(`/admin/organizations/${id}/approve`);
       setActionMessage('Organization approved');
@@ -71,6 +77,12 @@ export default function AdminOrganizations() {
   };
 
   const handleReject = async (id) => {
+    const confirmed = window.confirm(
+      'Are you sure you want to reject this organization? They will receive a rejection email.'
+    );
+    
+    if (!confirmed) return;
+
     try {
       await apiClient.patch(`/admin/organizations/${id}/reject`);
       setActionMessage('Organization rejected');

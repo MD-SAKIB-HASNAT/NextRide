@@ -50,6 +50,13 @@ export default function AdminUsers() {
   }, [filters]);
 
   const handleStatus = async (userId, status) => {
+    const statusLabel = status === 'active' ? 'Activate' : 'Block';
+    const confirmed = window.confirm(
+      `Are you sure you want to ${statusLabel.toLowerCase()} this user? They will receive an email notification.`
+    );
+    
+    if (!confirmed) return;
+
     try {
       await apiClient.patch(`/admin/users/${userId}/status`, { status });
       setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, status } : u)));
