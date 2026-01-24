@@ -136,6 +136,38 @@ export default function PaymentHistory() {
     }).format(amount);
   };
 
+  const downloadReceipt = async (transactionId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/payment/receipt/${transactionId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to download receipt");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `receipt-${transactionId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Failed to download receipt:", err);
+      alert("Failed to download receipt. Please try again.");
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -273,7 +305,7 @@ export default function PaymentHistory() {
 
                     {(payment.status === 'success') && (
                       <button
-                        onClick={() => navigate(`/payment-receipt/${payment._id}`)}
+                        onClick={() => downloadReceipt(payment._id)}
                         className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
                         title="Download Receipt"
                       >
