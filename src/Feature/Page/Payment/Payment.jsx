@@ -48,27 +48,7 @@ export default function Payment() {
       icon: CreditCard,
       color: "text-sky-600",
     },
-    {
-      key: "bkash",
-      name: "bKash",
-      description: "Mobile wallet payment via bKash",
-      icon: Smartphone,
-      color: "text-pink-600",
-    },
-    {
-      key: "nagad",
-      name: "Nagad",
-      description: "Mobile wallet payment via Nagad",
-      icon: Smartphone,
-      color: "text-orange-600",
-    },
-    {
-      key: "manual",
-      name: "Other Methods",
-      description: "Bank transfer or cash at office",
-      icon: Wallet,
-      color: "text-emerald-600",
-    },
+   
   ]), []);
 
   const startPayment = async (method) => {
@@ -82,9 +62,16 @@ export default function Payment() {
         alert("This method is not available yet. Using SSLCommerz.");
       }
 
+      const platformFee = Number(vehicle.platformFee || 0);
+      if (platformFee <= 0) {
+        alert("No payment is required for this listing. Please wait for admin approval.");
+        navigate('/dashboard');
+        return;
+      }
+
       const payload = {
         referenceId: vehicle._id,
-        amount: vehicle.platformFee || 100,
+        amount: platformFee,
         currency: "BDT",
         product_name: `${vehicle.make} ${vehicle.modelName}`,
         product_category: vehicle.vehicleType,
@@ -105,13 +92,14 @@ export default function Payment() {
       }
     } catch (err) {
       console.error(err);
-      alert("Payment initiation failed. Please try again.");
+      const msg = err?.response?.data?.message || "Payment initiation failed. Please try again.";
+      alert(msg);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
           <p className="mt-4 text-slate-600">Loading payment details...</p>
@@ -122,7 +110,7 @@ export default function Payment() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center">
         <div className="bg-white rounded-2xl shadow p-8 max-w-md w-full text-center">
           <h1 className="text-2xl font-bold text-red-700">Error</h1>
           <p className="mt-2 text-slate-700">{error}</p>
@@ -139,7 +127,7 @@ export default function Payment() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-slate-100">
       <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8">
         <button
           onClick={() => navigate(-1)}

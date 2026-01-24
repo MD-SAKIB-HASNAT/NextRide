@@ -13,6 +13,7 @@ export default function UsedCar() {
         const response = await apiClient.get("/vehicles/public/filtered-listings", {
           params: {
             vehicleType: "car",
+            status:"active",
             limit: 6,
           },
         });

@@ -595,6 +595,7 @@ export default function SellVehicle() {
                 <option value="diesel">Diesel</option>
                 <option value="electric">Electric</option>
                 <option value="hybrid">Hybrid</option>
+                <option value="octane">Octane</option>
               </select>
             </div>
           </div>

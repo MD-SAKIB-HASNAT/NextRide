@@ -114,6 +114,32 @@ export default function AdminPaymentHistory() {
         <p className="text-slate-500 mt-2">View and manage all payment transactions</p>
       </div>
 
+      {/* Summary Stats */}
+      <div className="mt-6 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+          <div className="text-sm font-medium text-emerald-800">Total Transactions</div>
+          <div className="text-2xl font-bold text-emerald-900 mt-1">{payments.length}</div>
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="text-sm font-medium text-blue-800">Successful</div>
+          <div className="text-2xl font-bold text-blue-900 mt-1">
+            {payments.filter((p) => p.status === 'success').length}
+          </div>
+        </div>
+        <div className="bg-rose-50 border border-rose-200 rounded-xl p-4">
+          <div className="text-sm font-medium text-rose-800">Failed</div>
+          <div className="text-2xl font-bold text-rose-900 mt-1">
+            {payments.filter((p) => p.status === 'failed').length}
+          </div>
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="text-sm font-medium text-amber-800">Pending</div>
+          <div className="text-2xl font-bold text-amber-900 mt-1">
+            {payments.filter((p) => p.status === 'pending' || p.status === 'initiated').length}
+          </div>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -270,31 +296,7 @@ export default function AdminPaymentHistory() {
         </div>
       )}
 
-      {/* Summary Stats */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-          <div className="text-sm font-medium text-emerald-800">Total Transactions</div>
-          <div className="text-2xl font-bold text-emerald-900 mt-1">{payments.length}</div>
-        </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <div className="text-sm font-medium text-blue-800">Successful</div>
-          <div className="text-2xl font-bold text-blue-900 mt-1">
-            {payments.filter((p) => p.status === 'success').length}
-          </div>
-        </div>
-        <div className="bg-rose-50 border border-rose-200 rounded-xl p-4">
-          <div className="text-sm font-medium text-rose-800">Failed</div>
-          <div className="text-2xl font-bold text-rose-900 mt-1">
-            {payments.filter((p) => p.status === 'failed').length}
-          </div>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <div className="text-sm font-medium text-amber-800">Pending</div>
-          <div className="text-2xl font-bold text-amber-900 mt-1">
-            {payments.filter((p) => p.status === 'pending' || p.status === 'initiated').length}
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }
