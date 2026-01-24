@@ -49,7 +49,7 @@ export default function Login() {
       const message = err.response?.data?.message;
       
       if (status === 401) {
-        setError("Invalid email or password. Please try again.");
+        setError(message || "Invalid email or password.");
       } else if (status === 404) {
         setError("Account not found. Please check your email or register.");
       } else if (status === 403) {

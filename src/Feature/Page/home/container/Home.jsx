@@ -1,20 +1,19 @@
 import React from 'react';
 import Banner from '../ui/Banner';
 import UsedBike from '../ui/UsedBike';
-import Feedback from '../ui/Feedback';
+import BrandMarquee from '../ui/BrandMarquee';
 import UsedCar from '../ui/UsedCar';
-import SuggestedVehicle from '../ui/SuggestedVehicle';
-import AIChatAssistant from '@/Components/AIChatAssistant';
+import SuggestedRentVehicle from '../ui/SuggestedRentVehicle';
 
 export default function Home() {
   return (
     <>
       <Banner /> 
-      <SuggestedVehicle />
+      <SuggestedRentVehicle />
       <UsedBike />
       <UsedCar />
-      <Feedback />
-      <AIChatAssistant />
+      <BrandMarquee />
+      
     </>
   );
 }

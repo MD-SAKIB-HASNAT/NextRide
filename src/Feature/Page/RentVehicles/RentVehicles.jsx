@@ -16,6 +16,10 @@ export default function RentVehicles() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     fetchVehicles();
   }, [filters]);
 

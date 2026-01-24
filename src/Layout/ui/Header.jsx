@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Phone, Search, Menu, X, LogOut } from "lucide-react";
+import { Phone, Menu, X, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Header() {
@@ -34,33 +34,20 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           
-          {/* Logo - always visible */}
-          <a href="/" className="flex items-center gap-2 flex-shrink-0">
+          {/* Logo and Brand - Prominent */}
+          <a href="/" className="flex items-center gap-3 flex-shrink-0 group">
             <img
               src="/logo.png"
               alt="NextRide logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              className="w-12 h-12 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform duration-300"
             />
-            <span className="text-base sm:text-lg font-semibold text-slate-900 hidden sm:block">
-              NextRide
-            </span>
+            <div className="hidden sm:flex flex-col">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
+                NextRide
+              </span>
+              <span className="text-xs text-slate-500 font-medium">Your Ride Awaits</span>
+            </div>
           </a>
-
-          {/* Desktop search - hidden on mobile */}
-          <form className="hidden lg:block flex-1 max-w-xl mx-4 relative">
-            <input
-              type="search"
-              placeholder="Search bikes, cars, brands..."
-              className="w-full rounded-full border-2 border-blue-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
-            />
-            <button
-              type="submit"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-sky-500 text-white flex items-center justify-center"
-              aria-label="Search"
-            >
-              <Search size={16} />
-            </button>
-          </form>
 
           {/* Desktop right section */}
           <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
@@ -147,24 +134,6 @@ export default function Header() {
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-slate-200">
           <div className="px-4 py-3 space-y-1">
-            {/* Mobile search */}
-            <form className="mb-3">
-              <div className="relative">
-                <input
-                  type="search"
-                  placeholder="Search bikes, cars, brands..."
-                  className="w-full rounded-full border-2 border-blue-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-sky-500 text-white flex items-center justify-center"
-                  aria-label="Search"
-                >
-                  <Search size={16} />
-                </button>
-              </div>
-            </form>
-
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (

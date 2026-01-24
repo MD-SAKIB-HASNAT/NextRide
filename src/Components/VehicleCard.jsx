@@ -73,24 +73,6 @@ export default function VehicleCard({ vehicle }) {
           </div>
         </div>
 
-        {/* Seller Info */}
-        {vehicle.userId && (
-          <div className="pt-2 border-t border-slate-200 mb-2">
-            <div className="text-xs">
-              <div className="flex items-center gap-1.5 text-slate-700 mb-1">
-                <User size={12} className="text-slate-400 shrink-0" />
-                <span className="font-medium truncate">{vehicle.userId.name}</span>
-              </div>
-              {vehicle.userId.phone && (
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <Phone size={12} className="text-slate-400 shrink-0" />
-                  <span className="text-xs">{vehicle.userId.phone}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Action Button */}
         <button
           onClick={() => navigate(`/vehicles/${vehicle._id}`)}

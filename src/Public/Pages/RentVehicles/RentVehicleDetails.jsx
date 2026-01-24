@@ -12,6 +12,10 @@ export default function RentVehicleDetails() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchVehicle = async () => {
       try {
         const { data } = await apiClient.get(`/rent/${id}`);
