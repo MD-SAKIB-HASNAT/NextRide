@@ -66,19 +66,20 @@ export default function SellVehicle() {
   const [existingVehicle, setExistingVehicle] = useState(null);
   const [form, setForm] = useState({
     vehicleType: "car",
-    make: "Toyota",
-    modelName: "Corolla 2020",
-    year: 2020,
-    price: "1850000",
-    mileage: "45000",
-    fuelType: "petrol",
-    condition: "excellent",
-    description: "Well-maintained vehicle, full service history, no accident, single owner, all documents clear. Interior and exterior in excellent condition. AC working perfectly. All safety features functional.",
-    location: "Dhaka",
-    phone: "01712345678",
+    make: "",
+    modelName: "",
+    year: "",
+    price: "",
+    mileage: "",
+    fuelType: "",
+    condition: "",
+    description: "",
+    location: "",
+    phone: "",
     images: [],
     video: null,
   });
+
   const [isCustomMake, setIsCustomMake] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
