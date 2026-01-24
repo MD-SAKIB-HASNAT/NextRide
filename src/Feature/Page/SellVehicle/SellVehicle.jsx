@@ -59,6 +59,7 @@ export default function SellVehicle() {
 
   const [step, setStep] = useState("form");
   const [newListingId, setNewListingId] = useState(null);
+  const [platformFee, setPlatformFee] = useState(0);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -323,10 +324,14 @@ export default function SellVehicle() {
       }
 
       const listingId = response.data?._id || response.data?.id || response.data?.vehicleId;
+      const fee = response.data?.platformFee || 0;
+      
       setNewListingId(listingId);
+      setPlatformFee(fee);
       setStep("success");
       
-      if (!isEditMode) {
+      // Only show payment modal if platformFee > 0 and not in edit mode
+      if (!isEditMode && fee > 0) {
         setShowPaymentModal(true);
       }
     } catch (err) {
@@ -875,6 +880,8 @@ export default function SellVehicle() {
   }
 
   if (step === "success") {
+    const isZeroFee = platformFee === 0 && !isEditMode;
+    
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-slate-100 p-3 sm:p-4">
         <div className="w-full max-w-md bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-6 md:p-8 border border-green-100 text-center">
@@ -888,7 +895,9 @@ export default function SellVehicle() {
           <p className="text-sm sm:text-base text-slate-500 mb-5 sm:mb-6 px-2">
             {isEditMode 
               ? "Your changes have been submitted. An admin will review and approve them soon."
-              : "Your listing has been submitted successfully. Please complete the platform fee payment and wait for admin approval to go live."}
+              : isZeroFee 
+                ? "Your listing has been submitted successfully. Please wait for admin approval to go live."
+                : "Your listing has been submitted successfully. Please complete the platform fee payment and wait for admin approval to go live."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -898,7 +907,7 @@ export default function SellVehicle() {
             >
               Go to Dashboard
             </button>
-            {!isEditMode && newListingId && (
+            {!isEditMode && !isZeroFee && newListingId && (
               <button
                 onClick={() => navigate(`/payment/${newListingId}`)}
                 className="flex-1 rounded-xl py-2.5 sm:py-3 text-sm sm:text-base text-white font-semibold shadow-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-600 transition"
@@ -908,7 +917,7 @@ export default function SellVehicle() {
             )}
           </div>
         </div>
-        {!isEditMode && showPaymentModal && (
+        {!isEditMode && !isZeroFee && showPaymentModal && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-6">
               <h3 className="text-xl font-bold text-slate-900 mb-2">Platform Fee Payment Required</h3>

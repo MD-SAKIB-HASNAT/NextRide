@@ -38,7 +38,7 @@ export default function RentVehicles() {
         },
       });
 
-      console.log(data);
+     // console.log(data);
 
       if (cursor) {
         setVehicles((prev) => [...prev, ...(data?.data || [])]);
@@ -119,12 +119,12 @@ export default function RentVehicles() {
             <option value="rented">Rented</option>
           </select>
 
-          <button
+          {/* <button
             onClick={() => fetchVehicles()}
             className="px-3 py-2 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200"
           >
             Refresh
-          </button>
+          </button> */}
         </div>
 
         {error && (
